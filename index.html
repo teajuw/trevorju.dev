@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>trevorju.dev</title>
+<style>
+  :root { --paper: #ECEAE3; --ink: #161616; --accent: #FF4B1F; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; line-height: 24px; }
+  .frame { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; max-width: 1280px; box-sizing: border-box; padding: 64px; min-height: 100vh; align-content: start; }
+  .site { grid-column: 1 / 5; font-weight: 700; }
+  .mark { grid-column: 9 / 13; height: 96px; background: var(--accent); }
+  .word { grid-column: 1 / 13; margin-top: 192px; font-size: 144px; line-height: 144px; font-weight: 700; letter-spacing: -0.03em; }
+  @media (max-width: 599px) {
+    .frame { grid-template-columns: repeat(4, 1fr); column-gap: 16px; padding: 16px; }
+    .site { grid-column: 1 / 4; }
+    .mark { grid-column: 4 / 5; height: 48px; }
+    .word { grid-column: 1 / 5; margin-top: 96px; font-size: 64px; line-height: 64px; }
+  }
+</style>
+</head>
+<body>
+<main class="frame">
+  <div class="site">trevorju.dev</div>
+  <div class="mark"></div>
+  <div class="word">Soon</div>
+</main>
+</body>
+</html>
