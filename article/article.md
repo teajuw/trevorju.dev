@@ -1,6 +1,8 @@
 # trevorju.dev
 
-A portfolio that is a repo of repos: every project page is built from that project's own GitHub repo at a pinned commit, and every page can be handed to an LLM in one click.
+A portfolio that is a repo of repos.
+
+Every project page is built from that project's own GitHub repo at a pinned commit, and can be handed to an LLM in one click.
 
 ## Why
 

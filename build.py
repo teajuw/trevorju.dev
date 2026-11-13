@@ -17,14 +17,12 @@ import sys
 import tomllib
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import quote
 
 import markdown
 
 ROOT = Path(__file__).parent
 OUT = ROOT / "_site"
 TPL = ROOT / "templates"
-WORDS_PER_MINUTE = 230
 
 
 def git(*args, cwd=ROOT):
@@ -37,23 +35,33 @@ def fill(template, **values):
     return template
 
 
-def split_readme(text):
-    """Title, standalone first paragraph, and the rest."""
-    lines = text.strip().splitlines()
-    title = ""
-    if lines and lines[0].startswith("# "):
-        title = lines.pop(0)[2:].strip()
+def take_paragraph(lines):
+    """Pop the next paragraph off the front if it is prose; otherwise leave the lines alone."""
     while lines and not lines[0].strip():
         lines.pop(0)
     first = []
     while lines and lines[0].strip():
         first.append(lines.pop(0).strip())
-    lede = " ".join(first)
-    if lede[:1] in "#-*`<!|>" or re.match(r"\d+\.", lede):
+    para = " ".join(first)
+    if para[:1] in "#-*`<!|>" or re.match(r"\d+\.", para):
         # Not a sentence (a list, heading, badge row...): leave it in the body.
-        lines = first + lines
-        lede = ""
-    return title, lede, "\n".join(lines).strip()
+        lines[:0] = first
+        return ""
+    return para
+
+
+def split_article(text, with_abstract):
+    """Title, the one sentence, the abstract, and the rest.
+
+    A README used as a fallback has no abstract: its second paragraph is body text.
+    """
+    lines = text.strip().splitlines()
+    title = ""
+    if lines and lines[0].startswith("# "):
+        title = lines.pop(0)[2:].strip()
+    lede = take_paragraph(lines)
+    abstract = take_paragraph(lines) if with_abstract and lede else ""
+    return title, lede, abstract, "\n".join(lines).strip()
 
 
 def render(md_text):
@@ -120,14 +128,14 @@ def read_project(site, folder, slug, url, is_self=False):
     candidates = ("article/article.md",) if is_self else ("article/article.md", "README.md")
     source = next((f for f in candidates if (folder / f).exists()), "")
     text = (folder / source).read_text() if source else ""
-    title, lede, body = split_readme(text)
+    title, lede, abstract, body = split_article(text, with_abstract=source == "article/article.md")
     notes_dir = ROOT / "notes" / slug
     notes = (notes_dir / "notes.md").read_text() if (notes_dir / "notes.md").exists() else ""
     log = (notes_dir / "log.md").read_text() if (notes_dir / "log.md").exists() else ""
     return {
         "slug": slug, "repo": repo, "url": url, "sha": full_sha[:7], "date": date, "self": is_self,
         "folder": folder, "file": source, "base": posixpath.dirname(source),
-        "readme": text, "title": title or slug, "has_title": bool(title), "lede": lede, "body": body,
+        "readme": text, "title": title or slug, "has_title": bool(title), "lede": lede, "abstract": abstract, "body": body,
         "notes": notes, "log": log,
         "source_url": f"{url}/tree/{full_sha}",
         "page_url": f"{site['url']}/{slug}/",
@@ -187,53 +195,59 @@ def build():
     rows = []
     for p in projects:
         rows.append(
-            f'    <a class="row" href="/{p["slug"]}/" data-spy="{esc(p["title"])}">'
-            f'<span class="mono when">{p["date"]:%b %d, %Y}</span>'
-            f'<span><span class="t">{esc(p["title"])}</span><span class="d">{inline(p["lede"])}</span></span>'
+            f'    <a class="row grid" href="/{p["slug"]}/">'
+            f'<span class="side mono when">{p["date"]:%b %d, %Y}</span>'
+            f'<span class="what"><span class="t">{esc(p["title"])}</span><span class="d">{inline(p["lede"])}</span></span>'
             f'<span class="arr">→</span></a>'
         )
     for _ in range(site.get("blanks", 0)):
         rows.append(
-            '    <div class="row blank"><span class="mono when">—</span>'
-            f'<span><span class="t">{esc(site.get("blank_title", "Next project"))}</span>'
-            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span></span><span></span></div>'
+            '    <div class="row grid blank"><span class="side mono when">—</span>'
+            f'<span class="what"><span class="t">{esc(site.get("blank_title", "Next project"))}</span>'
+            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span></span></div>'
         )
-    home = fill((TPL / "home.html").read_text(), name=esc(site["name"]), tagline=esc(site["tagline"]), rows="\n".join(rows))
+    def abstract_html(text):
+        return " " + inline(text) if text else ""
+
+    home = fill(
+        (TPL / "home.html").read_text(), name=esc(site["name"]), tagline=esc(site["tagline"]),
+        abstract=abstract_html(site.get("abstract", "")),
+        rows="\n".join(rows))
     (OUT / "index.html").write_text(fill(
-        base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt",
-        copy_url="/llms-full.txt", copy_title="Copy the whole portfolio as markdown",
-        brand=brand, github=esc(site["github"]), body=home))
+        base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt", brand=brand, body=home,
+        nav=f'<a class="tl" href="{esc(site["github"])}">GitHub ↗</a>'))
 
     # articles and their markdown twins
     article = (TPL / "article.html").read_text()
     for p in projects:
-        prompt = f"Read {p['md_abs']} and summarize this project."
         page = fill(
             article,
-            title=esc(p["title"]), standfirst=inline(p["lede"]), repo=esc(p["repo"]),
+            title=esc(p["title"]), standfirst=inline(p["lede"]), abstract=abstract_html(p["abstract"]),
+            repo=esc(p["repo"]), repo_url=esc(p["url"]),
             updated=f"{p['date']:%b %d, %Y}", sha=p["sha"],
-            minutes=str(max(1, round(len(p["readme"].split()) / WORDS_PER_MINUTE))),
             source_url=esc(p["source_url"]), slug=p["slug"],
-            claude_url="https://claude.ai/new?q=" + quote(prompt),
             page_url=esc(p["page_url"]), md_abs=esc(p["md_abs"]),
             content=absolutize(render(p["body"]), p),
         )
         (OUT / p["slug"]).mkdir(exist_ok=True)
         (OUT / p["slug"] / "index.html").write_text(fill(
             base, title=f"{esc(p['title'])} · {esc(site['name'])}", description=esc(p["lede"]),
-            md_url=f"/{p['slug']}.md", copy_url=f"/{p['slug']}.md", copy_title="Copy this page as markdown",
-            brand=brand, github=esc(site["github"]), body=page))
+            md_url=f"/{p['slug']}.md", brand=brand, body=page,
+            nav=f'<a class="tl" href="{esc(p["source_url"])}">View source ↗</a>'
+                f'<button class="tl" id="copyLLM" type="button" data-md="/{p["slug"]}.md" '
+                f'title="Copy this page as markdown">Copy for LLM</button>'))
         (OUT / f"{p['slug']}.md").write_text(twin(p))
 
     # llms.txt and llms-full.txt
-    index = [f"# {site['name']}", "", f"> {site['tagline']}", "",
+    summary = " ".join(filter(None, [site["tagline"], site.get("abstract", "")]))
+    index = [f"# {site['name']}", "", f"> {summary}", "",
              "Each project page is built from its own GitHub repo at a pinned commit. "
              "Every page has a markdown twin at the same URL with `.md`.", "", "## Projects", ""]
     index += [f"- [{p['title']}]({p['md_abs']}): {p['lede']}" for p in projects]
     index += ["", "## Source", "", f"- [This site's repo]({site['repo']}): `git clone --recursive {site['repo']}` gets every project at its pinned commit",
               f"- [Everything in one file]({site['url']}/llms-full.txt)", ""]
     (OUT / "llms.txt").write_text("\n".join(index))
-    full = [f"# {site['name']}", "", f"> {site['tagline']}", ""] + [twin(p) for p in projects]
+    full = [f"# {site['name']}", "", f"> {summary}", ""] + [twin(p) for p in projects]
     (OUT / "llms-full.txt").write_text("\n".join(full))
     return site, projects
 
@@ -259,6 +273,8 @@ def check(projects):
         # ARTICLES.md rules: warn, never block.
         if not p["lede"]:
             warnings.append(f"{s}: {p['file']} does not open with one standalone sentence")
+        elif p["file"] == "article/article.md" and not p["abstract"]:
+            warnings.append(f"{s}: {p['file']} has no abstract after its opening sentence")
         # Whether an article needs a visual or a number is a judgement, so neither is checked.
         if re.search(r"!\[\s*\]\(", p["readme"]):
             warnings.append(f"{s}: an image has no alt text")

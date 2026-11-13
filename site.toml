@@ -1,6 +1,8 @@
 # The few facts about the site that are not in a project repo.
 name = "Trevor Ju"
-tagline = "I build software that is checked: evals, loops and the tools around them."
+# The home page opens like an article: the name, one sentence, then an abstract.
+tagline = "Claude's human in the loop."
+abstract = "I write evals, build agents, and pit them against each other."
 url = "https://trevorju.dev"
 github = "https://github.com/teajuw"
 repo = "https://github.com/teajuw/trevorju.dev"

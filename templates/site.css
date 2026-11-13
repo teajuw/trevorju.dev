@@ -1,4 +1,11 @@
-/* Layout and components. Values come from tokens.css. */
+/* Layout and components. Values come from tokens.css.
+
+   Everything sits on one 12-column grid inside the page width:
+     columns 1-2   the date column on the home page; empty on an article
+     columns 3-    text: the name, headlines, abstracts, the article
+   The header holds the site name on column 1 and word links at the right edge.
+   An article's section indicator is fixed at the far left of the window,
+   outside the grid. */
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
@@ -13,51 +20,48 @@ img{max-width:100%;height:auto}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .mono{font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
 .wrap{max-width:var(--page);margin:0 auto;padding:0 var(--gutter)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--col-gap)}
+.side{grid-column:1 / span 2}
+.main{grid-column:3 / -1}
 
-/* nav */
+/* header */
 .nav{position:sticky;top:0;z-index:20;height:var(--nav-h);background:color-mix(in srgb,var(--bg) 88%,transparent);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
-.nav .wrap{height:100%;display:flex;align-items:center;gap:8px}
+.nav .wrap{height:100%;display:flex;align-items:center;gap:26px}
 .brand{font-family:var(--mono);font-size:14px;font-weight:500;margin-right:auto}
+.tl{font-family:var(--mono);font-size:12.5px;white-space:nowrap;border-bottom:1px solid var(--rule)}
+.tl:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .brand i{font-style:normal;color:var(--accent)}
-.btn{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.02em;border:1px solid var(--ink);border-radius:var(--button-radius);padding:7px 13px;white-space:nowrap}
-.btn:hover{background:var(--ink);color:var(--bg)}
-.btn.solid{background:var(--ink);color:var(--bg)}
-.btn.solid:hover{background:var(--accent);border-color:var(--accent)}
+
+/* a small label over a value, as under an article's abstract */
+.meta{display:flex;flex-wrap:wrap;gap:8px 40px;margin:34px 0 0}
+.meta div{display:flex;align-items:baseline;gap:12px}
+.lb{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.vv{font-family:var(--mono);font-size:13.5px;margin:0;overflow-wrap:anywhere}
+.vv a{border-bottom:1px solid var(--rule)}
+.vv a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* page head, shared by home and article */
+.head{padding:72px 0 36px;border-bottom:1px solid var(--ink);align-items:end}
+.head h1{font-weight:500;font-size:clamp(44px,7.4vw,84px);line-height:1;letter-spacing:-.025em;margin:0 0 22px}
+/* the sentence and the abstract run together as one paragraph */
+.head .lede{grid-column:3 / span 9;margin:0;font-size:21px;line-height:1.45;color:var(--ink-2)}
 
 /* home */
-.hero{padding:72px 0 44px}
-.hero h1{font-weight:500;font-size:clamp(44px,8vw,84px);line-height:1;letter-spacing:-.025em;margin:0 0 20px}
-.hero p{max-width:34em;margin:0;color:var(--ink-2);font-size:21px;line-height:1.45}
-.list-top{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--ink)}
-.row{display:grid;grid-template-columns:132px 1fr auto;gap:8px 28px;align-items:baseline;padding:22px 0;border-bottom:1px solid var(--rule)}
+.cols{padding:12px 0;border-bottom:1px solid var(--rule)}
+.row{padding:22px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.row .what{grid-column:3 / span 9}
 .row .t{display:block;font-size:28px;line-height:1.15;font-weight:500;letter-spacing:-.01em}
 .row .d{display:block;color:var(--ink-2);font-size:17px;line-height:1.45;margin-top:4px;max-width:36em}
-.row .arr{font-family:var(--mono);color:var(--ink-3);transition:transform .15s,color .15s}
+.row .arr{grid-column:12;justify-self:end;font-family:var(--mono);color:var(--ink-3);transition:transform .15s,color .15s}
 a.row:hover .t{color:var(--accent)}
 a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
 .row.blank .t,.row.blank .d,.row.blank .when{color:var(--ink-3)}
 
 /* article */
-.a-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,var(--measure)) minmax(0,1fr);gap:0 28px;padding:0 var(--gutter)}
-.a-grid>*{grid-column:2}
-.a-hero{padding:64px 0 0}
-.chip{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--ink);border-radius:var(--button-radius);padding:3px 9px;margin-bottom:22px}
-.a-hero h1{font-weight:500;font-size:clamp(40px,7vw,64px);line-height:1.02;letter-spacing:-.025em;margin:0 0 16px}
-.standfirst{font-size:23px;line-height:1.4;color:var(--ink-2);margin:0 0 30px}
-.live{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:7px;vertical-align:1px}
-
-/* side rail: what the page was built from, and what to do with it */
-.rail{grid-column:3;grid-row:1 / span 3;align-self:start;position:sticky;top:calc(var(--nav-h) + 28px);margin-top:118px;max-width:230px}
-.rail .meta{display:grid;gap:14px;margin:0;padding-bottom:18px;border-bottom:1px solid var(--rule)}
-.rail dt,.rail dd{margin:0}
-.rail .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;color:var(--ink-3);margin-bottom:3px}
-.rail .vv{font-family:var(--mono);font-size:13px;overflow-wrap:anywhere}
-.rail .links{display:grid;gap:11px;justify-items:start;padding-top:16px}
-.rail .links a,.rail .links button{font-family:var(--mono);font-size:12.5px;color:var(--ink);text-align:left;border-bottom:1px solid transparent}
-.rail .links a:hover,.rail .links button:hover{color:var(--accent);border-bottom-color:var(--accent)}
-
-.prose{padding:28px 0 0;border-top:1px solid var(--ink)}
+.body{padding-top:36px}
+.prose{grid-column:3 / span 7}
+.prose>:first-child{margin-top:0}
 .prose h2{font-weight:600;font-size:30px;line-height:1.15;letter-spacing:-.015em;margin:52px 0 14px;scroll-margin-top:calc(var(--nav-h) + 24px)}
 .prose h3{font-weight:600;font-size:22px;line-height:1.2;margin:36px 0 10px}
 .prose p,.prose ul,.prose ol,.prose table,.prose blockquote{margin:0 0 20px}
@@ -74,10 +78,11 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
 .prose pre code{background:none;padding:0;font-size:inherit}
 .prose pre .cp{position:absolute;top:10px;right:12px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
 .prose pre .cp:hover{color:var(--accent)}
-.a-foot{margin-top:56px;padding:18px 0;border-top:1px solid var(--ink);display:flex;flex-wrap:wrap;gap:8px 22px}
-.a-foot a:hover{color:var(--accent)}
+.foot{margin-top:56px;padding:18px 0;border-top:1px solid var(--ink)}
+.foot .main{display:flex;flex-wrap:wrap;gap:8px 22px}
+.foot a:hover{color:var(--accent)}
 
-/* section indicator, fixed at the top left */
+/* section indicator, fixed at the top left of the window */
 .spy{position:fixed;left:14px;top:calc(var(--nav-h) + 22px);z-index:25}
 .spy-ticks{display:flex;flex-direction:column;gap:9px;padding:10px 8px;cursor:pointer}
 .spy-ticks i{display:block;height:3px;width:15px;border-radius:2px;background:var(--ink-3);opacity:.55;transition:width .18s,background .18s,opacity .18s}
@@ -85,6 +90,7 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
 .spy-panel{position:absolute;top:-6px;left:-4px;min-width:250px;max-width:300px;background:var(--raised);border:1px solid var(--rule);border-radius:var(--box-radius);
   box-shadow:0 10px 30px rgba(20,20,19,.10);padding:8px;opacity:0;visibility:hidden;transform:translateX(-4px);transition:opacity .14s,transform .14s,visibility .14s}
 .spy:hover .spy-panel,.spy:focus-within .spy-panel,.spy.open .spy-panel{opacity:1;visibility:visible;transform:none}
+.spy.shut .spy-panel{opacity:0!important;visibility:hidden!important;transition:none!important}
 .spy-panel a{display:flex;align-items:center;gap:12px;padding:7px 10px;font-family:var(--ui);font-size:14.5px;line-height:1.3;color:var(--ink-2)}
 .spy-panel a::before{content:"";flex:none;width:14px;height:2px;border-radius:2px;background:var(--ink-3);opacity:.6}
 .spy-panel a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -103,24 +109,20 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
 .selpop button,.selpop a{font-family:var(--mono);font-size:11.5px;color:var(--bg);padding:6px 10px;white-space:nowrap}
 .selpop button:hover,.selpop a:hover{background:color-mix(in srgb,var(--bg) 16%,transparent)}
 
-@media (max-width:1260px) and (min-width:861px){.wrap{padding-left:72px}}
-@media (max-width:1240px){
-  /* no room beside the text: the rail becomes a strip under the title */
-  .rail{grid-column:2;grid-row:auto;position:static;margin:0;max-width:none;padding:16px 0 18px;border-top:1px solid var(--ink)}
-  .rail .meta{grid-template-columns:repeat(4,auto);justify-content:space-between;gap:14px 24px;border-bottom:0;padding-bottom:14px}
-  .rail .links{display:flex;flex-wrap:wrap;gap:8px 22px;padding-top:0}
-  .prose{border-top-color:var(--rule)}
-}
-@media (max-width:860px){
+/* room for the section indicator when the window is not much wider than the page */
+@media (max-width:1260px) and (min-width:961px){.wrap{padding-left:72px}}
+
+/* one column: the detail column folds in above the text */
+@media (max-width:960px){
   body{font-size:var(--text-small)}
-  .hero{padding:52px 0 30px}
-  .row{grid-template-columns:1fr auto}
-  .row .when{grid-column:1 / -1}
-  .a-grid{grid-template-columns:minmax(0,1fr)}
-  .a-grid>*{grid-column:1}
-  .a-hero{padding-top:52px}
-  .rail{grid-column:1}
-  .rail .meta{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .grid>*,.head .lede,.row .what,.row .arr,.prose{grid-column:1}
+  .head{padding:52px 0 26px}
+  .meta{gap:8px 28px;margin-top:26px}
+  .cols{display:none}
+  .row{row-gap:6px}
+  .row .arr{display:none}
+  .body{padding-top:28px}
   .spy{top:var(--nav-h);left:0;right:0;background:color-mix(in srgb,var(--bg) 92%,transparent);
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
   .spy-ticks{flex-direction:row;align-items:center;gap:7px;padding:12px var(--gutter)}
@@ -128,4 +130,5 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
   .sb{display:none}
   html.js{scrollbar-width:auto}
 }
+@media (max-width:560px){.nav .wrap{gap:18px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}

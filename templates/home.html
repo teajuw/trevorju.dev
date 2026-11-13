@@ -1,9 +1,9 @@
 <main class="wrap">
-  <section class="hero">
-    <h1 data-spy="{{name}}">{{name}}</h1>
-    <p>{{tagline}}</p>
+  <section class="head grid">
+    <h1 class="main">{{name}}</h1>
+    <p class="lede">{{tagline}}{{abstract}}</p>
   </section>
-  <div class="list-top"><span class="mono">Projects</span><span class="mono">Last updated ↓</span></div>
+  <div class="cols grid"><span class="side mono">Last updated ↓</span><span class="main mono">Projects</span></div>
   <div id="list">
 {{rows}}
   </div>

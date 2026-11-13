@@ -35,9 +35,11 @@
       const a = el('a');
       a.href = it.t.tagName === 'A' ? it.t.href : '#';
       a.append(el('span', null, it.label));
-      a.addEventListener('click', e => { e.preventDefault(); spy.classList.remove('open'); a.blur(); it.go(); });
+      // A click jumps and shuts the list at once; it can reopen after the pointer has left.
+      a.addEventListener('click', e => { e.preventDefault(); spy.classList.remove('open'); spy.classList.add('shut'); a.blur(); it.go(); });
       panel.append(a);
     });
+    spy.addEventListener('mouseleave', () => spy.classList.remove('shut'));
     ticks.addEventListener('click', () => spy.classList.toggle('open'));
     document.addEventListener('click', e => { if (!spy.contains(e.target)) spy.classList.remove('open'); });
   }

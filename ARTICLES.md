@@ -43,20 +43,39 @@ GitHub-flavoured Markdown. No front matter, no HTML, no custom syntax. The
 title, one-liner, date, commit and reading time on the page are all taken from
 the file and from git; nothing is typed twice.
 
-## The one fixed rule: how it opens
+## The fixed rule: how it opens
 
 ```markdown
-# Project name
+# trevorju.dev
 
-One standalone sentence: what it is and why it matters.
+A portfolio that is a repo of repos.
+
+Every project page is built from that project's own GitHub repo at a pinned commit, and can be handed to an LLM in one click.
 
 ## Why
 ...
 ```
 
-A title, then **one standalone sentence**, alone in its own paragraph. It has
-to make sense with nothing around it: it is also the one-liner on the home page
-and the first line an LLM is handed.
+Three lines, in this order:
+
+1. **The title.** The `# ` line is the project's name and nothing else. It does
+   not change.
+2. **One sentence.** Alone in its own paragraph: what the project is, said as
+   plainly or as memorably as it can be. It is also the line under the title
+   on the home page.
+3. **An abstract.** The next paragraph, a sentence or two: what it does and why
+   it matters.
+
+Each has to make sense with nothing around it, since together they are the
+first three lines an LLM is handed.
+
+On the page the sentence and the abstract run together as one paragraph.
+
+The page then shows the repo and the last-updated date on one row under the
+abstract. Both come from git; do not write them in the file.
+
+The home page opens the same way: the name, one sentence, an abstract. Those
+two lines are `tagline` and `abstract` in `site.toml`.
 
 After that, use `##` sections. Each one becomes a dash in the page's section
 indicator, so keep their names short. Which sections to use is up to the
@@ -91,7 +110,8 @@ say nothing. Never invent or estimate a number.
 |---|---|---|
 | The file exists | `article/article.md` is present | warn, and README is used |
 | Title | first line starts with `# ` | error |
-| One standalone sentence | the first paragraph is prose, not a list, heading or image | warn |
+| One sentence | the first paragraph is prose, not a list, heading or image | warn |
+| Abstract | a second prose paragraph follows it | warn |
 | Alt text | every image has some | warn |
 
 Nothing checks for a visual or a number being present. Whether an article
@@ -102,6 +122,8 @@ needs one is a judgement, not a rule.
 - 2026-11-13: the first version required a numbers list and a visual before
   the first section. Trevor found that too strict after seeing it applied:
   keep the opening sentence, keep visuals, but use them where they fit.
+- 2026-11-13: the opening became three lines, title, one sentence, abstract,
+  after the layout of articles on claude.dev. The title stays the project name.
 
 ## Not decided yet
 

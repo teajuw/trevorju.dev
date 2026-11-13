@@ -1,31 +1,24 @@
-<main class="a-grid">
-  <header class="a-hero">
-    <span class="chip">Project</span>
-    <h1 data-spy="{{title}}">{{title}}</h1>
-    <p class="standfirst">{{standfirst}}</p>
+<main class="wrap">
+  <header class="head grid">
+    <h1 class="main" data-spy="{{title}}">{{title}}</h1>
+    <p class="lede">{{standfirst}}{{abstract}}</p>
+    <dl class="meta main">
+      <div><dt class="lb">Repo</dt><dd class="vv"><a href="{{repo_url}}">{{repo}}</a></dd></div>
+      <div><dt class="lb">Last updated</dt><dd class="vv">{{updated}}</dd></div>
+    </dl>
   </header>
 
-  <aside class="rail" aria-label="About this page">
-    <dl class="meta">
-      <div><dt class="lb">REPO</dt><dd class="vv">{{repo}}</dd></div>
-      <div><dt class="lb">LAST UPDATED</dt><dd class="vv"><span class="live"></span>{{updated}}</dd></div>
-      <div><dt class="lb">BUILT FROM</dt><dd class="vv">{{sha}}</dd></div>
-      <div><dt class="lb">READING TIME</dt><dd class="vv">{{minutes}} min</dd></div>
-    </dl>
-    <div class="links">
-      <a href="{{source_url}}">View source ↗</a>
-      <a href="{{claude_url}}">Open in Claude ↗</a>
-    </div>
-  </aside>
-
-  <article class="prose" data-source="{{title}} @ {{sha}}, {{page_url}}" data-md="{{md_abs}}">
+  <div class="body grid">
+    <article class="prose" data-source="{{title}} @ {{sha}}, {{page_url}}" data-md="{{md_abs}}">
 {{content}}
-  </article>
+    </article>
+  </div>
 
-  <footer class="a-foot mono">
-    <span>Built from {{sha}}</span>
-    <a href="/{{slug}}.md">{{slug}}.md</a>
-    <a href="{{source_url}}">Source ↗</a>
-    <a href="/">← All projects</a>
+  <footer class="foot grid">
+    <div class="main mono">
+      <span>Built from {{sha}}</span>
+      <a href="/{{slug}}.md">{{slug}}.md</a>
+      <a href="/">← All projects</a>
+    </div>
   </footer>
 </main>
