@@ -52,7 +52,7 @@ img{max-width:100%;height:auto}
 .cols{padding:12px 0;border-bottom:1px solid var(--rule)}
 .row{padding:22px 0;border-bottom:1px solid var(--rule);align-items:baseline}
 .row .what{grid-column:3 / span 9}
-.row .t{display:block;font-family:var(--display);font-weight:700;font-size:32px;line-height:1.05;letter-spacing:-.04em}
+.row .t{display:block;font-size:28px;line-height:1.15;font-weight:500;letter-spacing:-.01em}
 .row .d{display:block;color:var(--ink-2);font-size:17px;line-height:1.45;margin-top:4px;max-width:36em}
 .row .arr{grid-column:12;justify-self:end;font-family:var(--mono);color:var(--ink-3);transition:transform .15s,color .15s}
 a.row:hover .t{color:var(--accent)}
