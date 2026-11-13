@@ -118,7 +118,7 @@
     fetch(copyLLM.dataset.md).then(r => r.ok ? r.text() : '').then(t => { md = t; }).catch(() => {});
     copyLLM.addEventListener('click', async () => {
       if (!md) { location.href = copyLLM.dataset.md; return; }
-      try { await navigator.clipboard.writeText(md); flash(copyLLM, 'Copied as markdown'); }
+      try { await navigator.clipboard.writeText(md); flash(copyLLM, 'Copied'); }
       catch (_) { location.href = copyLLM.dataset.md; }
     });
   }
@@ -131,13 +131,6 @@
       flash(b, 'copied');
     });
     pre.prepend(b);
-  });
-
-  // ---- keys ----
-  addEventListener('keydown', e => {
-    if (e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test(e.target.tagName)) return;
-    const link = $('.nav a[data-key="' + e.key.toUpperCase() + '"]');
-    if (link) location.href = link.href;
   });
 
   const update = () => { spyUpdate(); sbUpdate(); };

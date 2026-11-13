@@ -2,12 +2,6 @@
 
 A portfolio that is a repo of repos: every project page is built from that project's own GitHub repo at a pinned commit, and every page can be handed to an LLM in one click.
 
-- **332 → about 20** tracked files, from the lab that generated the previous site to the repo that builds this one
-- **1** build script of under 300 lines, with one dependency
-- **0** writes to project repos: the site only ever reads them
-
-![Project repos on GitHub are read at a pinned commit by the portfolio repo, which holds the pins, notes and templates, and publishes the site with a markdown twin of every page.](./overview.svg)
-
 ## Why
 
 The previous version of this site designed itself. A generator wrote a page, an evaluator graded it against written criteria, and the loop ran round after round. It was a real project and a poor portfolio: the note that parked it reads "the whole loop feels random and unclear; simplify soon." The site before that had a chatbot that answered questions about the work.
