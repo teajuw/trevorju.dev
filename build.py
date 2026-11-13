@@ -13,6 +13,7 @@ import html
 import posixpath
 import re
 import shutil
+import urllib.parse
 import subprocess
 import sys
 import tomllib
@@ -109,6 +110,22 @@ def absolutize_md(text, p):
         bang, label, url = match.group(1), match.group(2), match.group(3)
         return match.group(0) if ABSOLUTE.match(url) else f"{bang}[{label}]({repo_url(p, url, bool(bang))})"
     return re.sub(r"(!?)\[([^\]]*)\]\(([^)\s]+)\)", fix, text)
+
+
+def youtube(page_html):
+    """A paragraph that is only a YouTube link becomes a player, keeping the link's start (t or start) and end times."""
+    def embed(match):
+        url = urllib.parse.urlparse(html.unescape(match.group(1)))
+        q = urllib.parse.parse_qs(url.query)
+        vid = url.path.strip("/") if url.netloc.endswith("youtu.be") else q.get("v", [""])[0]
+        if not re.fullmatch(r"[\w-]{6,20}", vid):
+            return match.group(0)
+        secs = lambda k: re.sub(r"\D", "", q.get(k, [""])[0])  # noqa: E731
+        args = [f"{name}={v}" for name, v in (("start", secs("t") or secs("start")), ("end", secs("end"))) if v]
+        src = f"https://www.youtube-nocookie.com/embed/{vid}" + ("?" + "&amp;".join(args) if args else "")
+        return (f'<iframe class="yt" src="{src}" title="YouTube video" loading="lazy" '
+                'allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>')
+    return re.sub(r'<p><a href="(https://(?:(?:www\.)?youtube\.com/watch\?|youtu\.be/)[^"]+)">[^<]*</a></p>', embed, page_html)
 
 
 def demo_frame(p):
@@ -248,7 +265,7 @@ def build():
             updated=f"{p['date']:%b %d, %Y}", sha=p["sha"],
             source_url=esc(p["source_url"]), slug=p["slug"],
             page_url=esc(p["page_url"]), md_abs=esc(p["md_abs"]),
-            content=demo_frame(p) + absolutize(render(p["body"]), p),
+            content=demo_frame(p) + youtube(absolutize(render(p["body"]), p)),
         )
         (OUT / p["slug"]).mkdir(exist_ok=True)
         if p["demo"]:

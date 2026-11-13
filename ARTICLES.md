@@ -19,6 +19,8 @@ are different documents with different readers, so they are different files.
     └── *.png *.svg *.gif  its visuals, if any, referenced as ./name.png
                            a video is ![what it shows](./name.mp4): the page plays it
                            silently on a loop; keep it short and a few MB at most
+                           a YouTube link alone on a line, written <https://www.youtube.com/watch?v=ID&t=287s&end=297>,
+                           becomes a player that starts (and, with end, stops) at those seconds
     └── demo/index.html    optional: a live demo, shown at the top of the page
 
 trevorju.dev/              (written by /sync, never by hand)
