@@ -138,6 +138,8 @@ def main():
             page.goto(url, wait_until="networkidle")
             check(f"{name}: stylesheet applied", styled(page))
             check(f"{name}: no sideways scroll", page.evaluate("() => document.documentElement.scrollWidth <= innerWidth"))
+            check(f"{name}: the opening paragraph uses the full width",
+                  page.evaluate("() => document.querySelector('.head .lede').getBoundingClientRect().width > innerWidth * 0.8"))
             shot(page, name)
         ctx.close()
         browser.close()

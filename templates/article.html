@@ -2,9 +2,13 @@
   <header class="head grid">
     <h1 class="main" data-spy="{{title}}">{{title}}</h1>
     <p class="lede">{{standfirst}}{{abstract}}</p>
-    <dl class="meta main">
-      <div><dt class="lb">Repo</dt><dd class="vv"><a href="{{repo_url}}">{{repo}}</a></dd></div>
-      <div><dt class="lb">Last updated</dt><dd class="vv">{{updated}}</dd></div>
+    <dl class="facts">
+      <div><dt>Repo</dt><dd><a href="{{repo_url}}">{{repo}}</a></dd></div>
+      <div><dt>Last updated</dt><dd>{{updated}}</dd></div>
+      <div><dt></dt><dd class="acts">
+        <a href="{{source_url}}">View source</a>
+        <button id="copyLLM" type="button" data-md="/{{slug}}.md" title="Copy this page as markdown">Copy for LLM</button>
+      </dd></div>
     </dl>
   </header>
 

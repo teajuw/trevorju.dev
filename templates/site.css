@@ -3,7 +3,8 @@
    Everything sits on one 12-column grid inside the page width:
      columns 1-2   the date column on the home page; empty on an article
      columns 3-    text: the name, headlines, abstracts, the article
-   The header holds the site name on column 1 and word links at the right edge.
+   The header bar holds only the site name, on column 1. Titles are set in
+   Helvetica; the facts about a page sit to the right of its opening paragraph.
    An article's section indicator is fixed at the far left of the window,
    outside the grid. */
 *{box-sizing:border-box}
@@ -27,31 +28,31 @@ img{max-width:100%;height:auto}
 /* header */
 .nav{position:sticky;top:0;z-index:20;height:var(--nav-h);background:color-mix(in srgb,var(--bg) 88%,transparent);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
-.nav .wrap{height:100%;display:flex;align-items:center;gap:26px}
-.brand{font-family:var(--mono);font-size:14px;font-weight:500;margin-right:auto}
-.tl{font-family:var(--mono);font-size:12.5px;white-space:nowrap;border-bottom:1px solid var(--rule)}
-.tl:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.nav .wrap{height:100%;display:flex;align-items:center}
+.brand{font-family:var(--mono);font-size:14px;font-weight:500}
 .brand i{font-style:normal;color:var(--accent)}
 
-/* a small label over a value, as under an article's abstract */
-.meta{display:flex;flex-wrap:wrap;gap:8px 40px;margin:34px 0 0}
-.meta div{display:flex;align-items:baseline;gap:12px}
-.lb{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin:0}
-.vv{font-family:var(--mono);font-size:13.5px;margin:0;overflow-wrap:anywhere}
-.vv a{border-bottom:1px solid var(--rule)}
-.vv a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+/* the facts beside the opening paragraph: a label column and a value column */
+.facts{font-family:var(--display);font-size:13px;line-height:1.45;display:grid;gap:7px;align-content:start;margin:0}
+.facts div{display:grid;grid-template-columns:7.6em minmax(0,1fr);column-gap:12px}
+.facts dt{color:var(--ink-2)}
+.facts dd{margin:0;overflow-wrap:anywhere}
+.facts .acts{display:grid;gap:5px;justify-items:start}
+.facts a,.facts button{border-bottom:1px solid currentColor}
+.facts a:hover,.facts button:hover{color:var(--accent)}
+.head .facts{grid-column:10 / -1;padding-top:6px}
 
 /* page head, shared by home and article */
-.head{padding:72px 0 36px;border-bottom:1px solid var(--ink);align-items:end}
-.head h1{font-weight:500;font-size:clamp(44px,7.4vw,84px);line-height:1;letter-spacing:-.025em;margin:0 0 22px}
+.head{padding:64px 0 34px;border-bottom:1px solid var(--ink);align-items:start}
+.head h1{font-family:var(--display);font-weight:700;font-size:clamp(56px,8.4vw,116px);line-height:.9;letter-spacing:-.045em;margin:0 0 38px -.045em}
 /* the sentence and the abstract run together as one paragraph */
-.head .lede{grid-column:3 / span 8;margin:0;font-size:21px;line-height:1.45;color:var(--ink-2)}
+.head .lede{grid-column:3 / span 6;margin:0;font-size:21px;line-height:1.45;color:var(--ink-2)}
 
 /* home */
 .cols{padding:12px 0;border-bottom:1px solid var(--rule)}
 .row{padding:22px 0;border-bottom:1px solid var(--rule);align-items:baseline}
 .row .what{grid-column:3 / span 9}
-.row .t{display:block;font-size:28px;line-height:1.15;font-weight:500;letter-spacing:-.01em}
+.row .t{display:block;font-family:var(--display);font-weight:700;font-size:32px;line-height:1.05;letter-spacing:-.04em}
 .row .d{display:block;color:var(--ink-2);font-size:17px;line-height:1.45;margin-top:4px;max-width:36em}
 .row .arr{grid-column:12;justify-self:end;font-family:var(--mono);color:var(--ink-3);transition:transform .15s,color .15s}
 a.row:hover .t{color:var(--accent)}
@@ -116,9 +117,9 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
 @media (max-width:960px){
   body{font-size:var(--text-small)}
   .grid{grid-template-columns:minmax(0,1fr)}
-  .grid>*,.head .lede,.row .what,.row .arr,.prose{grid-column:1}
+  .grid>*,.head .lede,.head .facts,.row .what,.row .arr,.prose{grid-column:1}
   .head{padding:52px 0 26px}
-  .meta{gap:8px 28px;margin-top:26px}
+  .head .facts{margin-top:24px}
   .cols{display:none}
   .row{row-gap:6px}
   .row .arr{display:none}
@@ -130,5 +131,4 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
   .sb{display:none}
   html.js{scrollbar-width:auto}
 }
-@media (max-width:560px){.nav .wrap{gap:18px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}

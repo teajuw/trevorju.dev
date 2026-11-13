@@ -216,10 +216,10 @@ def build():
     home = fill(
         (TPL / "home.html").read_text(), name=esc(site["name"]), tagline=esc(site["tagline"]),
         abstract=abstract_html(site.get("abstract", "")),
+        github=esc(site["github"]), github_name=esc(site["github"].rstrip("/").split("/")[-1]),
         rows="\n".join(rows))
     (OUT / "index.html").write_text(fill(
-        base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt", brand=brand, body=home,
-        nav=f'<a class="tl" href="{esc(site["github"])}">GitHub ↗</a>'))
+        base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt", brand=brand, body=home))
 
     # articles and their markdown twins
     article = (TPL / "article.html").read_text()
@@ -236,10 +236,7 @@ def build():
         (OUT / p["slug"]).mkdir(exist_ok=True)
         (OUT / p["slug"] / "index.html").write_text(fill(
             base, title=f"{esc(p['title'])} · {esc(site['name'])}", description=esc(p["lede"]),
-            md_url=f"/{p['slug']}.md", brand=brand, body=page,
-            nav=f'<a class="tl" href="{esc(p["source_url"])}">View source ↗</a>'
-                f'<button class="tl" id="copyLLM" type="button" data-md="/{p["slug"]}.md" '
-                f'title="Copy this page as markdown">Copy for LLM</button>'))
+            md_url=f"/{p['slug']}.md", brand=brand, body=page))
         (OUT / f"{p['slug']}.md").write_text(twin(p))
 
     # llms.txt and llms-full.txt

@@ -9,6 +9,7 @@
   --rule:#e4e1d7;
   --accent:#c2613f;
 
+  --display:"Helvetica Neue",Helvetica,Arial,sans-serif;   /* the name, titles and the small facts */
   --serif:"Newsreader","Iowan Old Style","Charter",Georgia,serif;
   --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
   --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
