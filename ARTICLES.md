@@ -19,6 +19,7 @@ are different documents with different readers, so they are different files.
     └── *.png *.svg *.gif  its visuals, if any, referenced as ./name.png
                            a video is ![what it shows](./name.mp4): the page plays it
                            silently on a loop; keep it short and a few MB at most
+    └── demo/index.html    optional: a live demo, shown at the top of the page
 
 trevorju.dev/              (written by /sync, never by hand)
 ├── projects/<name>        the pin: the commit the page is built from
@@ -99,6 +100,24 @@ Trevor likes visuals in an article, used appropriately. That means:
   LLM reader get the alt text and not the picture.
 - Check it at phone width. Text inside an image shrinks with it.
 
+## A live demo
+
+A project can ship one demo: `article/demo/index.html`, a complete page of its
+own with whatever files it needs beside it. The site copies the folder to
+`/<name>/demo/` and shows it in a frame at the top of the article, under the
+repo row. The article file itself stays plain Markdown.
+
+- It must work when opened on its own, at phone width, with no build step.
+- It may link `/assets/tokens.css` to pick up the site's colours and fonts, with
+  fallbacks for when that file is not there.
+- The frame is sized to the demo. The demo reports its height with
+  `parent.postMessage({type: "demo-height", height: <px>}, "*")` whenever it
+  changes.
+- It hosts nothing it has no right to host. A demo that plays someone else's
+  music or video embeds the owner's own player.
+- Use one where trying the thing shows more than reading about it. Most
+  projects do not need one.
+
 ## Numbers
 
 If the project has measured results, say them plainly and early enough that a
@@ -115,6 +134,7 @@ say nothing. Never invent or estimate a number.
 | One sentence | the first paragraph is prose, not a list, heading or image | warn |
 | Abstract | a second prose paragraph follows it | warn |
 | Alt text | every image has some | warn |
+| Demo | `article/demo/` holds no symlinks | error |
 
 Nothing checks for a visual or a number being present. Whether an article
 needs one is a judgement, not a rule.
@@ -126,6 +146,9 @@ needs one is a judgement, not a rule.
   keep the opening sentence, keep visuals, but use them where they fit.
 - 2026-11-13: the opening became three lines, title, one sentence, abstract,
   after the layout of articles on claude.dev. The title stays the project name.
+
+- 2026-11-13: a project may ship a live demo, after bar2vec's section names
+  turned out to be easier to judge by listening than by reading scores.
 
 ## Not decided yet
 

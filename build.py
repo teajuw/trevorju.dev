@@ -111,6 +111,14 @@ def absolutize_md(text, p):
     return re.sub(r"(!?)\[([^\]]*)\]\(([^)\s]+)\)", fix, text)
 
 
+def demo_frame(p):
+    """The project's demo page in a frame. site.js sets the height the demo reports; 560px holds until it does."""
+    if not p["demo"]:
+        return ""
+    return (f'<iframe class="demo" src="/{p["slug"]}/demo/" title="{html.escape(p["title"])} live demo" loading="lazy" '
+            'allow="autoplay; encrypted-media; fullscreen; picture-in-picture" style="height:560px"></iframe>\n')
+
+
 def demote(notes_text):
     """notes.md, moved one heading level down so it sits under the article."""
     out = []
@@ -141,6 +149,8 @@ def read_project(site, folder, slug, url, is_self=False):
         "folder": folder, "file": source, "base": posixpath.dirname(source),
         "readme": text, "title": title or slug, "has_title": bool(title), "lede": lede, "abstract": abstract, "body": body,
         "notes": notes, "log": log,
+        # A live demo is article/demo/index.html: a page of its own, shown in a frame at the top of the article.
+        "demo": source == "article/article.md" and (folder / "article" / "demo" / "index.html").is_file(),
         "source_url": f"{url}/tree/{full_sha}",
         "page_url": f"{site['url']}/{slug}/",
         "md_abs": f"{site['url']}/{slug}.md",
@@ -171,6 +181,8 @@ def twin(p):
     """The page as markdown: what Copy for LLM copies and what agents fetch."""
     head = f"<!-- source: {p['source_url']} | last updated: {p['date']:%Y-%m-%d} | page: {p['page_url']} -->"
     parts = [head, absolutize_md(p["readme"].strip(), p)]
+    if p["demo"]:
+        parts.append(f"Live demo: {p['page_url']}demo/")
     if p["notes"]:
         parts += ["---", demote(p["notes"])]
     return "\n\n".join(parts) + "\n"
@@ -236,9 +248,11 @@ def build():
             updated=f"{p['date']:%b %d, %Y}", sha=p["sha"],
             source_url=esc(p["source_url"]), slug=p["slug"],
             page_url=esc(p["page_url"]), md_abs=esc(p["md_abs"]),
-            content=absolutize(render(p["body"]), p),
+            content=demo_frame(p) + absolutize(render(p["body"]), p),
         )
         (OUT / p["slug"]).mkdir(exist_ok=True)
+        if p["demo"]:
+            shutil.copytree(p["folder"] / "article" / "demo", OUT / p["slug"] / "demo", symlinks=False)
         (OUT / p["slug"] / "index.html").write_text(fill(
             base, title=f"{esc(p['title'])} · {esc(site['name'])}", description=esc(p["lede"]),
             md_url=f"/{p['slug']}.md", brand=brand, body=page))
@@ -282,6 +296,8 @@ def check(projects):
         elif p["file"] == "article/article.md" and not p["abstract"]:
             warnings.append(f"{s}: {p['file']} has no abstract after its opening sentence")
         # Whether an article needs a visual or a number is a judgement, so neither is checked.
+        if p["demo"] and any(f.is_symlink() for f in (p["folder"] / "article" / "demo").rglob("*")):
+            errors.append(f"{s}: article/demo/ contains a symlink")
         if re.search(r"!\[\s*\]\(", p["readme"]):
             warnings.append(f"{s}: an image has no alt text")
     for page in OUT.rglob("*.html"):

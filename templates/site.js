@@ -135,6 +135,14 @@
     pre.prepend(b);
   });
 
+  // A project's demo runs in a frame and reports its own height, so the frame never scrolls inside the page.
+  addEventListener('message', e => {
+    if (e.origin !== location.origin || !e.data || e.data.type !== 'demo-height') return;
+    document.querySelectorAll('iframe.demo').forEach(f => {
+      if (f.contentWindow === e.source) f.style.height = Math.max(120, Math.min(+e.data.height || 0, 2000)) + 'px';
+    });
+  });
+
   const update = () => { spyUpdate(); sbUpdate(); };
   addEventListener('scroll', () => { update(); hideSel(); }, { passive: true });
   addEventListener('resize', update);

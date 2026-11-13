@@ -100,6 +100,15 @@ def main():
         check("article: the text column is centred on the page", abs(gaps[0] - gaps[1]) <= 2,
               f"left {gaps[0]:.0f}px, right {gaps[1]:.0f}px")
 
+        # A project's live demo sits in a frame at the top of the article and sets its own height.
+        if page.locator("iframe.demo").count():
+            page.wait_for_timeout(1500)
+            inner = page.frame_locator("iframe.demo").locator("body").evaluate("b => b.scrollHeight")
+            outer = page.evaluate("() => document.querySelector('iframe.demo').getBoundingClientRect().height")
+            check("demo: the frame loaded", inner > 100, f"content {inner}px tall")
+            check("demo: the frame is as tall as its content", abs(inner - outer) <= 4, f"content {inner}px, frame {outer:.0f}px")
+            shot(page, "article-demo")
+
         sections = page.locator("#spyPanel a").count()
         check("article: indicator lists the sections", sections > 1, f"{sections} found")
         if sections > 1:

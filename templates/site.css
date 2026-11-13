@@ -73,6 +73,7 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
 .prose a{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
 .prose code{font-family:var(--mono);font-size:.78em;background:var(--surface);border-radius:var(--box-radius);padding:2px 5px}
 .prose blockquote{border-left:2px solid var(--accent);padding-left:18px;color:var(--ink-2)}
+.prose iframe.demo{display:block;width:100%;border:0;margin:0 0 36px}
 .prose table{border-collapse:collapse;width:100%;font-size:16px}
 .prose th,.prose td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
 .prose th{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);border-bottom-color:var(--ink)}
