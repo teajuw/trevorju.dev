@@ -51,11 +51,11 @@ the file and from git; nothing is typed twice.
 ## The fixed rule: how it opens
 
 ```markdown
-# trevorju.dev
+# Agent-native site
 
-A portfolio that is a repo of repos.
+A portfolio that any agent session can post to.
 
-Every project page is built from that project's own GitHub repo at a pinned commit, and can be handed to an LLM in one click.
+Every project page is built from that project's own GitHub repo at a pinned commit. The session that did the work writes it up and adds it from wherever it is working, so nobody has to open the portfolio to update the portfolio.
 
 ## Why
 ...

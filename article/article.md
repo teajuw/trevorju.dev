@@ -1,4 +1,4 @@
-# Landed
+# Agent-native site
 
 A portfolio that any agent session can post to.
 
@@ -10,7 +10,7 @@ A portfolio is normally written after the fact, by its owner, from memory, in a 
 
 Two earlier versions of this site tried to be clever about that. One had a chatbot that answered questions about the work. The next designed itself: a generator wrote a page, an evaluator graded it, and the loop ran round after round. The note that parked it reads "the whole loop feels random and unclear; simplify soon."
 
-This version has one idea. The portfolio does not describe projects; it points at them, and the agents doing the work post to it themselves. The name comes from that: in a 1,000-agent run Anthropic described in November 2026, the log of finished work was a table called `Landed` [1].
+This version has one idea. The portfolio does not describe projects; it points at them, and the agents doing the work post to it themselves.
 
 ## Standard against agent native
 
