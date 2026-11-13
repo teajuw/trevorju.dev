@@ -3,18 +3,21 @@
     <span class="chip">Project</span>
     <h1 data-spy="{{title}}">{{title}}</h1>
     <p class="standfirst">{{standfirst}}</p>
-    <div class="metagrid">
-      <div><div class="lb">REPO</div><div class="vv">{{repo}}</div></div>
-      <div><div class="lb">LAST UPDATED</div><div class="vv"><span class="live"></span>{{updated}}</div></div>
-      <div><div class="lb">BUILT FROM</div><div class="vv">{{sha}}</div></div>
-      <div><div class="lb">READING TIME</div><div class="vv">{{minutes}} min</div></div>
-    </div>
-    <div class="actions">
-      <a class="btn solid" href="{{source_url}}">View on GitHub ↗</a>
-      <button class="btn" id="copyLLM" type="button" data-md="/{{slug}}.md">Copy for LLM</button>
-      <a class="btn" href="{{claude_url}}">Open in Claude ↗</a>
-    </div>
   </header>
+
+  <aside class="rail" aria-label="About this page">
+    <dl class="meta">
+      <div><dt class="lb">REPO</dt><dd class="vv">{{repo}}</dd></div>
+      <div><dt class="lb">LAST UPDATED</dt><dd class="vv"><span class="live"></span>{{updated}}</dd></div>
+      <div><dt class="lb">BUILT FROM</dt><dd class="vv">{{sha}}</dd></div>
+      <div><dt class="lb">READING TIME</dt><dd class="vv">{{minutes}} min</dd></div>
+    </dl>
+    <div class="links">
+      <a href="{{source_url}}">View on GitHub ↗</a>
+      <button id="copyLLM" type="button" data-md="/{{slug}}.md">Copy for LLM</button>
+      <a href="{{claude_url}}">Open in Claude ↗</a>
+    </div>
+  </aside>
 
   <article class="prose" data-source="{{title}} @ {{sha}}, {{page_url}}" data-md="{{md_abs}}">
 {{content}}

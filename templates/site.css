@@ -49,12 +49,19 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
 .chip{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--ink);border-radius:var(--button-radius);padding:3px 9px;margin-bottom:22px}
 .a-hero h1{font-weight:500;font-size:clamp(40px,7vw,64px);line-height:1.02;letter-spacing:-.025em;margin:0 0 16px}
 .standfirst{font-size:23px;line-height:1.4;color:var(--ink-2);margin:0 0 30px}
-.metagrid{display:grid;grid-template-columns:repeat(4,auto);justify-content:space-between;gap:16px 24px;padding:16px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
-.metagrid .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;color:var(--ink-3);margin-bottom:3px}
-.metagrid .vv{font-family:var(--mono);font-size:13px}
 .live{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:7px;vertical-align:1px}
-.actions{display:flex;flex-wrap:wrap;gap:8px;padding:18px 0 8px}
-.prose{padding:20px 0 0}
+
+/* side rail: what the page was built from, and what to do with it */
+.rail{grid-column:3;grid-row:1 / span 3;align-self:start;position:sticky;top:calc(var(--nav-h) + 28px);margin-top:118px;max-width:230px}
+.rail .meta{display:grid;gap:14px;margin:0;padding-bottom:18px;border-bottom:1px solid var(--rule)}
+.rail dt,.rail dd{margin:0}
+.rail .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;color:var(--ink-3);margin-bottom:3px}
+.rail .vv{font-family:var(--mono);font-size:13px;overflow-wrap:anywhere}
+.rail .links{display:grid;gap:11px;justify-items:start;padding-top:16px}
+.rail .links a,.rail .links button{font-family:var(--mono);font-size:12.5px;color:var(--ink);text-align:left;border-bottom:1px solid transparent}
+.rail .links a:hover,.rail .links button:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+.prose{padding:28px 0 0;border-top:1px solid var(--ink)}
 .prose h2{font-weight:600;font-size:30px;line-height:1.15;letter-spacing:-.015em;margin:52px 0 14px;scroll-margin-top:calc(var(--nav-h) + 24px)}
 .prose h3{font-weight:600;font-size:22px;line-height:1.2;margin:36px 0 10px}
 .prose p,.prose ul,.prose ol,.prose table,.prose blockquote{margin:0 0 20px}
@@ -101,6 +108,13 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
 .selpop button:hover,.selpop a:hover{background:color-mix(in srgb,var(--bg) 16%,transparent)}
 
 @media (max-width:1260px) and (min-width:861px){.wrap{padding-left:72px}}
+@media (max-width:1240px){
+  /* no room beside the text: the rail becomes a strip under the title */
+  .rail{grid-column:2;grid-row:auto;position:static;margin:0;max-width:none;padding:16px 0 18px;border-top:1px solid var(--ink)}
+  .rail .meta{grid-template-columns:repeat(4,auto);justify-content:space-between;gap:14px 24px;border-bottom:0;padding-bottom:14px}
+  .rail .links{display:flex;flex-wrap:wrap;gap:8px 22px;padding-top:0}
+  .prose{border-top-color:var(--rule)}
+}
 @media (max-width:860px){
   body{font-size:var(--text-small)}
   .nav .wrap{gap:16px}
@@ -111,7 +125,8 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
   .a-grid{grid-template-columns:minmax(0,1fr)}
   .a-grid>*{grid-column:1}
   .a-hero{padding-top:52px}
-  .metagrid{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch}
+  .rail{grid-column:1}
+  .rail .meta{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch}
   .spy{top:var(--nav-h);left:0;right:0;background:color-mix(in srgb,var(--bg) 92%,transparent);
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
   .spy-ticks{flex-direction:row;align-items:center;gap:7px;padding:12px var(--gutter)}

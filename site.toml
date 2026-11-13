@@ -5,6 +5,10 @@ url = "https://trevorju.dev"
 github = "https://github.com/teajuw"
 repo = "https://github.com/teajuw/trevorju.dev"
 
+# This repo is a project too, once article/article.md exists at its root.
+# Its page is served at /<self_slug>/.
+self_slug = "portfolio"
+
 # Placeholder rows on the home page for projects not written up yet. Set to 0 to remove.
 blanks = 2
 blank_title = "Next project"

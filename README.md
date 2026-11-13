@@ -10,6 +10,8 @@ trevorju.dev/                 this repo; a push here is a deploy
 │   ├── job-agent    @ 3f2a91c   ← not a folder: a pointer to a commit in github.com/teajuw/job-agent
 │   ├── md-reader    @ 9be04d7   ← same
 │   └── claudit      @ c41e7a0   ← same
+├── archive/                  projects taken off the site: same pointers, kept but not built
+├── article/                  this repo's own article; the site is one of its projects
 ├── notes/
 │   └── job-agent/            one folder per project, written by /sync
 │       ├── notes.md          what was built, tried and dropped, parked
@@ -109,9 +111,30 @@ The first time a project is added there is no diff to read, so the agent reads
 the repo once, including any `CLAUDE.md` or plan file it has, and writes the
 first notes from that.
 
+### Archiving a project
+
+Archiving takes a project off the site without losing it. It is a move between
+two folders, so the directory listing stays the only list of projects:
+
+```
+git mv projects/vibe archive/vibe      archive
+git mv archive/vibe projects/vibe      restore
+```
+
+An archived project keeps its pin, its notes and its log. It loses its page,
+its markdown twin, its row on the home page and its `llms.txt` entry, and
+`/sync` leaves it frozen at its last pin. Its old address stops working.
+
+### This repo is a project too
+
+The site has its own entry, at `/portfolio/`. It cannot be a submodule of
+itself, so `build.py` makes one exception: if `article/article.md` exists at
+the root of this repo, the repo is built as a project, pinned at the commit
+being deployed. It has no notes folder; this README does that job.
+
 ### Run by skills
 
-The site is operated through five Claude Code skills. They are the only way it
+The site is operated through six Claude Code skills. They are the only way it
 changes: no dashboard, no manual steps to remember.
 
 The skills are not in this repo. They ship as a private plugin, `portfolio`,
@@ -129,6 +152,7 @@ names are used below.
 | `/sync` | Pulls this repo, then for each project reads the diff since its pin, updates the notes it touches, adds a log line, moves the pin, and commits all three together. | this repo |
 | `/check` | Builds the site, fails on broken links, a missing title, a missing `.md` twin or a pin with no log line, warns on the `ARTICLES.md` rules, and takes screenshots of home and one article at phone and desktop width, then looks at them. | nothing |
 | `/publish` | Runs `/check`, then pushes. The push is the deploy. | GitHub |
+| `/archive <repo>` | Moves a project to `archive/` with a log line, or moves it back. | this repo |
 
 The usual run is `/sync`, look, `/publish`. A design change is an edit to a
 template or `tokens.css`, then `/check`, then `/publish`.
@@ -176,7 +200,7 @@ are decided against.
 | **S** | A markdown twin of every page (`/job-agent.md`) | The one thing agents actually want: the content with no HTML around it. |
 | **S** | Copy for LLM button | Same file as the twin, for the person who is about to paste it into a chat. |
 | **S** | `llms.txt` and `llms-full.txt` | One URL for an agent to find everything, one URL to read everything. Costs ten lines in `build.py`. |
-| **S** | Skills as the way the site is run (`/add-project`, `/article`, `/sync`, `/check`, `/publish`) | Every operation is a named procedure an agent runs the same way each time, and `/check` lets it see its own result. |
+| **S** | Skills as the way the site is run (`/add-project`, `/article`, `/sync`, `/check`, `/publish`, `/archive`) | Every operation is a named procedure an agent runs the same way each time, and `/check` lets it see its own result. |
 | **A** | Projects as git submodules | The project list becomes the directory listing, and `git clone --recursive` hands an agent the whole body of work. Costs: a sync step and public repos only. |
 | **A** | The pin as the bookmark for notes | Notes are updated from the diff since the last pin, not from a reread of the repo, so keeping them true costs almost nothing. |
 | **A** | Article rules in one file, checked on every build | Any session writing an article knows exactly which files to make and how they open, and `/check` says when one doesn't. |

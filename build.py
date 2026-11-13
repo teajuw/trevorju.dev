@@ -75,10 +75,19 @@ def repo_url(p, url, raw):
 
 
 def absolutize(page_html, p):
-    """Relative links and images in the rendered page point into the repo."""
+    """Relative images are copied next to the page; relative links point into the repo."""
     def fix(match):
         attr, url = match.group(1), match.group(2)
-        return match.group(0) if ABSOLUTE.match(url) else f'{attr}="{repo_url(p, url, attr == "src")}"'
+        if ABSOLUTE.match(url):
+            return match.group(0)
+        if attr == "src":
+            image = (p["folder"] / p["base"] / url).resolve()
+            if image.is_file() and p["folder"].resolve() in image.parents:
+                target = OUT / p["slug"] / "assets" / image.name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(image, target)
+                return f'src="/{p["slug"]}/assets/{image.name}"'
+        return f'{attr}="{repo_url(p, url, attr == "src")}"'
     return re.sub(r'(src|href)="([^"]+)"', fix, page_html)
 
 
@@ -102,35 +111,46 @@ def demote(notes_text):
     return "\n".join(out)
 
 
+def read_project(site, folder, slug, url, is_self=False):
+    repo = url.split("github.com/")[-1]
+    full_sha = git("rev-parse", "HEAD", cwd=folder)
+    date = datetime.strptime(git("log", "-1", "--format=%cs", cwd=folder), "%Y-%m-%d")
+    # The article is article/article.md; a project without one falls back to its README.
+    # This repo's own entry has no fallback: its README is the documentation, not an article.
+    candidates = ("article/article.md",) if is_self else ("article/article.md", "README.md")
+    source = next((f for f in candidates if (folder / f).exists()), "")
+    text = (folder / source).read_text() if source else ""
+    title, lede, body = split_readme(text)
+    notes_dir = ROOT / "notes" / slug
+    notes = (notes_dir / "notes.md").read_text() if (notes_dir / "notes.md").exists() else ""
+    log = (notes_dir / "log.md").read_text() if (notes_dir / "log.md").exists() else ""
+    return {
+        "slug": slug, "repo": repo, "url": url, "sha": full_sha[:7], "date": date, "self": is_self,
+        "folder": folder, "file": source, "base": posixpath.dirname(source),
+        "readme": text, "title": title or slug, "has_title": bool(title), "lede": lede, "body": body,
+        "notes": notes, "log": log,
+        "source_url": f"{url}/tree/{full_sha}",
+        "page_url": f"{site['url']}/{slug}/",
+        "md_abs": f"{site['url']}/{slug}.md",
+    }
+
+
 def load_projects(site):
+    """Live projects: the submodules under projects/, plus this repo if it has an article.
+
+    Submodules under archive/ are kept with their pins, notes and logs but not built.
+    """
     projects = []
     listing = git("config", "-f", ".gitmodules", "--get-regexp", r"^submodule\..*\.path$") if (ROOT / ".gitmodules").exists() else ""
     for line in listing.splitlines():
         key, path = line.split(" ", 1)
+        if not path.startswith("projects/"):
+            continue
         name = key[len("submodule."):-len(".path")]
         url = git("config", "-f", ".gitmodules", f"submodule.{name}.url").removesuffix(".git")
-        repo = url.split("github.com/")[-1]
-        folder = ROOT / path
-        slug = folder.name
-        full_sha = git("rev-parse", "HEAD", cwd=folder)
-        sha = full_sha[:7]
-        date = datetime.strptime(git("log", "-1", "--format=%cs", cwd=folder), "%Y-%m-%d")
-        # The article is article/article.md; a project without one falls back to its README.
-        source = next((f for f in ("article/article.md", "README.md") if (folder / f).exists()), "")
-        readme = (folder / source).read_text() if source else ""
-        title, lede, body = split_readme(readme)
-        notes_dir = ROOT / "notes" / slug
-        notes = (notes_dir / "notes.md").read_text() if (notes_dir / "notes.md").exists() else ""
-        log = (notes_dir / "log.md").read_text() if (notes_dir / "log.md").exists() else ""
-        projects.append({
-            "slug": slug, "repo": repo, "url": url, "sha": sha, "date": date,
-            "file": source, "base": posixpath.dirname(source),
-            "readme": readme, "title": title or slug, "has_title": bool(title), "lede": lede, "body": body,
-            "notes": notes, "log": log,
-            "source_url": f"{url}/tree/{full_sha}",
-            "page_url": f"{site['url']}/{slug}/",
-            "md_abs": f"{site['url']}/{slug}.md",
-        })
+        projects.append(read_project(site, ROOT / path, Path(path).name, url))
+    if (ROOT / "article" / "article.md").exists():
+        projects.append(read_project(site, ROOT, site.get("self_slug", "portfolio"), site["repo"], is_self=True))
     projects.sort(key=lambda p: p["date"], reverse=True)
     return projects
 
@@ -197,7 +217,7 @@ def build():
             page_url=esc(p["page_url"]), md_abs=esc(p["md_abs"]),
             content=absolutize(render(p["body"]), p),
         )
-        (OUT / p["slug"]).mkdir()
+        (OUT / p["slug"]).mkdir(exist_ok=True)
         (OUT / p["slug"] / "index.html").write_text(fill(
             base, title=f"{esc(p['title'])} · {esc(site['name'])}", description=esc(p["lede"]),
             md_url=f"/{p['slug']}.md", brand=brand, github=esc(site["github"]), body=page))
@@ -223,16 +243,16 @@ def check(projects):
         if not p["readme"]:
             errors.append(f"{s}: no article/article.md and no README.md")
             continue
-        if p["file"] != "article/article.md":
+        if p["file"] != "article/article.md" and not p["self"]:
             warnings.append(f"{s}: no article/article.md, so the page is built from README.md")
         if not p["has_title"]:
             errors.append(f"{s}: {p['file']} has no title (a first line starting with '# ')")
         if not (OUT / f"{s}.md").exists():
             errors.append(f"{s}: no markdown twin was built")
-        if not p["notes"]:
+        if not p["self"] and not p["notes"]:
             errors.append(f"{s}: notes/{s}/notes.md is missing")
         newest = next((l for l in p["log"].splitlines() if l.strip() and not l.startswith("#")), "")
-        if p["sha"] not in newest:
+        if not p["self"] and p["sha"] not in newest:
             errors.append(f"{s}: pinned at {p['sha']} but the newest line of notes/{s}/log.md does not name it; run /sync")
         # ARTICLES.md rules: warn, never block.
         if not p["lede"]:
