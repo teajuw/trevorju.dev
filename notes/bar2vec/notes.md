@@ -5,6 +5,7 @@ A music-structure project: it cuts a song into sections and names each one (intr
 
 ## Where things are
 - `article/` — the article for the site and its two climb charts (step graphs: kept rounds as a staircase, hollow dots for rounds not kept).
+- `article/demo/` — the live demo shown at the top of the page: `index.html` embeds six songs' official YouTube uploads and draws bar2vec's sections under the player; `sections.json` is its data, made by `scripts/demo_songs.py` from `songs.json`. No audio is hosted; the audio fetched for analysis stays in the git-ignored `audio_demo/`.
 - `PROCESS.md` — the full process log: timeline, every round, who decided what, what can and cannot be claimed, how to reproduce the final rows. Start here.
 - `cuts.json`, `scripts/cuts.py` — the cutter and its settings (the surface the first climb tuned). `scripts/hx_run.py` scores it.
 - `names.json`, `scripts/names.py` — the namer and its settings (the second climb). `scripts/nm_run.py` scores it on annotated boundaries; `scripts/nm_e2e.py` scores names end to end on the cutter's own cuts, by time; `scripts/name_model.py` is the trained classifier.
@@ -34,11 +35,12 @@ A music-structure project: it cuts a song into sections and names each one (intr
 - Using neighbour similarity to rename sections: short lead-in to the chorus becomes prechorus, sounds like the chorus group becomes chorus, neighbour order in the chorus pick. Best +0.5 ±0.6 on the tuning songs, no held-out round spent. The flag itself is reliable (such a verse is truly a verse 47% of the time against 73% otherwise), and was shown on the playlist page as `verse?` until the trained namer replaced the rule names there.
 - Horizontal bar charts in the article: replaced by step graphs, which show the shape of a climb and are shorter on screen.
 - The learned keep-or-drop filter on cuts (75.4) is kept only as a separate supervised row; the training-free cutter is the project's cutter, because the filter was learned from one pop-heavy dataset.
+- For the demo: hosting freely licensed music (the well-known free recordings are not pop form) and 30-second store previews (too short to show structure); embedding official YouTube uploads was used instead.
 - Git history before 2026-11-13 was squashed when the repo went public, to remove paper PDFs and a download record.
 
 ## Parked
 - Fitting the trained namer on bar2vec's own cuts: it was fitted on annotated boundaries and drops from 66.4 to 53.1 macro-F1 by time on the cuts (held-out songs; rules 54.9 to 44.2; perfect names on the cuts 89.5).
-- Listening to the trained names on the playlist page.
+- Listening to the trained names on the playlist page and on the six demo songs (the demo songs have no annotations, so nothing there is scored).
 - Learned attention between sections for naming (the rule-based stand-in was tried and dropped).
 - Re-cutting inside a long section at a finer scale.
 - Section-by-section song similarity.
