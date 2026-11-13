@@ -4,3 +4,6 @@
 [submodule "projects/bar2vec"]
 	path = projects/bar2vec
 	url = https://github.com/teajuw/bar2vec
+[submodule "projects/3rd-shot"]
+	path = projects/3rd-shot
+	url = https://github.com/teajuw/3rd-shot
