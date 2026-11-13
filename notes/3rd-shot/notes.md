@@ -4,7 +4,7 @@
 A research pipeline that turns single-camera broadcast video of a pickleball match into a 3D scene: the court, four bodies, their paddles and the ball, in feet and seconds. It runs offline on an Apple Silicon Mac. The longer aim is a simulator that learned players can play in. It was built on one match (the PPA Brisbane 2026 men's doubles final). No licence file for its own code yet.
 
 ## Where things are
-- `article/` — the article this site builds, its two demo videos and its one figure.
+- `article/` — the article this site builds, its two demo videos, the pipeline diagram and the shot-map figure. It links to the original broadcast at 287 s, which the site shows as a YouTube player.
 - `calib/`, `cuts/` — camera calibration from the court lines, and the split of the broadcast into camera shots.
 - `players/` — the four players' positions on the court from a keypoint detector.
 - `ball/` — 2D ball tracking.
@@ -36,7 +36,8 @@ From the repo's write-ups and the sessions that built it:
 - Contact height and bounce-or-volley as inputs to the shot model. No measurable gain over hitter position.
 - A screenshot of the 3D viewer as the article's lead image. Not taken; the lead is now a rendered video.
 - Orbit, side and top-down demo videos. Rendered but not used; two views of the same ten seconds were enough.
-- The broadcast clip beside the render. Left out, because it would put the tour's footage on a public page.
+- The broadcast clip beside the render as a file. Left out, because it would put the tour's footage on a public page; the article embeds the tour's own YouTube upload instead.
+- An architecture diagram with parallel tracks and a "camera sees, physics adds" diagram. Drafted; Trevor chose the simple six-step one.
 - The repo was first published as a card on the retired `teajuw/portfolio` site by mistake (2026-11-13).
 
 ## Parked
