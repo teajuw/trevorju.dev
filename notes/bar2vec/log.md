@@ -1,5 +1,6 @@
 # bar2vec sync log
 
+2026-11-13  abfd65b → 0b04337  Figure added under the demo: one song's bars coloured by their embeddings. Notes: Where things are.
 2026-11-13  e699431 → abfd65b  Article leads with "nobody told it" and defines its terms; demo sections now line up with the playhead. Notes: Where things are, Parked.
 2026-11-13  b0dc5c1 → e699431  Live demo added: six well-known songs played from YouTube with bar2vec's sections under the player. Notes: Where things are, Tried and dropped, Parked.
 2026-11-13  cf0ae89 → b0dc5c1  Names scored end to end on the cutter's own cuts; playlist page switched to the trained namer; article gained the end-to-end table. Notes: Where things are, Tried and dropped, Parked.
