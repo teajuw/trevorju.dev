@@ -4,7 +4,7 @@
 A music-structure project: it cuts a song into sections and names each one (intro, verse, chorus, bridge and so on) from frozen audio embeddings, one vector per bar. Both parts were tuned as hill climbs against the Harmonix Set with a random train / held-out split and a locked 180-song final test. Final test: cutter 72.7 (boundary F within 3 s) and 53.9 (within 0.5 s) with no training; namer macro-F1 55.9 with rules and 65.9 with a trained classifier. It began as a moment-search prototype on one playlist, and those pages are still in the repo.
 
 ## Where things are
-- `article/` — the article for the site and its two climb charts (step graphs: kept rounds as a staircase, hollow dots for rounds not kept).
+- `article/` — the article for the site (it opens with a Terms section; use those words: bar, embedding, audio model, similarity grid, cut, cutter, namer, rules, classifier) and its two climb charts (step graphs: kept rounds as a staircase, hollow dots for rounds not kept).
 - `article/demo/` — the live demo shown at the top of the page: `index.html` embeds six songs' official YouTube uploads and draws bar2vec's sections under the player; `sections.json` is its data, made by `scripts/demo_songs.py` from `songs.json`. No audio is hosted; the audio fetched for analysis stays in the git-ignored `audio_demo/`.
 - `PROCESS.md` — the full process log: timeline, every round, who decided what, what can and cannot be claimed, how to reproduce the final rows. Start here.
 - `cuts.json`, `scripts/cuts.py` — the cutter and its settings (the surface the first climb tuned). `scripts/hx_run.py` scores it.
@@ -41,7 +41,8 @@ A music-structure project: it cuts a song into sections and names each one (intr
 ## Parked
 - Fitting the trained namer on bar2vec's own cuts: it was fitted on annotated boundaries and drops from 66.4 to 53.1 macro-F1 by time on the cuts (held-out songs; rules 54.9 to 44.2; perfect names on the cuts 89.5).
 - Listening to the trained names on the playlist page and on the six demo songs (the demo songs have no annotations, so nothing there is scored).
-- Learned attention between sections for naming (the rule-based stand-in was tried and dropped).
+- Learned attention between sections for naming (the rule-based stand-in was tried and dropped); worth returning to with more labelled songs or pretraining on unlabelled music.
+- Other ways of grouping bars (k-means, spectral clustering) for the chorus pick, and nearest neighbours across songs for names. Either would reopen the naming climb, which the stopping rule closed.
 - Re-cutting inside a long section at a finer scale.
 - Section-by-section song similarity.
 - Testing on music outside Harmonix.
