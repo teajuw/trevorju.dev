@@ -28,5 +28,10 @@ its screenshots on the real host, still needs a deploy. Today every push to
   space that agents post to. What would make it better?
 - A tier list, with visuals.
 
-**Status.** Not started. Paused on purpose for the research in
-`research/agent-native-orgs/`, which should inform the answer.
+**Status.** The research is in `research/agent-native-orgs/`. It argues against a
+standing `dev` branch or second site, and for a preview per pull request.
+
+- Done 2026-11-13 (design A): each session works in its own clone, and the
+  plugin loads a paragraph into every session saying where the portfolio is.
+- Next (design B): pull requests with previews. Hosting options and a
+  recommendation are in `research/hosting-previews.md`. Nothing is set up.

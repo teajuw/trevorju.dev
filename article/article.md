@@ -22,7 +22,7 @@ The right-hand column is the design. The last column says how much of it exists 
 | Who writes it up | The owner, later, from memory | The session that did the work, while it still knows why | Live |
 | Where the work happens | In the portfolio's repo | From any repo, through skills | Live |
 | How contributors coordinate | By message, or not at all | Through a shared record: pins, notes, a log | Live for finished work, not for work in flight |
-| How a session finds the site | It has to pick the right tool | A line that is always loaded tells it | Planned |
+| How a session finds the site | It has to pick the right tool | A paragraph that is always loaded tells it | Live |
 | Seeing a change first | After it is live | A preview per change, with screenshots | Planned |
 | Who checks the whole | Nobody; each page stands alone | One reader approves each change against the site's goal | Planned |
 | Who can read it | People with a browser | People and models: a markdown twin of every page | Live |
@@ -56,7 +56,7 @@ On the day this article was written, a session was asked to add a project to the
 
 That failure has been measured. Vercel tested agents on framework APIs they had not seen in training. A skill holding the documentation was never opened in 56% of runs and scored 53%, the same as no documentation. A short index that was always loaded scored 100% [4].
 
-So a skill carries the procedure, and something always loaded has to say where the portfolio is. The old repos are now archived with a notice in each. The always-loaded line is planned.
+So a skill carries the procedure, and something always loaded has to say where the portfolio is. The old repos are now archived with a notice in each, and the plugin loads one paragraph into every session as it starts, saying where the portfolio is and which skills run it.
 
 ## A preview per change
 
@@ -66,7 +66,7 @@ Today a session pushes to `main` and the push is the deploy. The first time anyo
 
 The obvious fix is a `dev` branch, or a second site for staging. None of the teams I read that run on agents does that. Anthropic's own source control discourages branches other than main and release branches, and moves the gate to just before deploy [2]. What they give each change instead is its own preview.
 
-![Today: one shared folder, check, push to main, live site. Planned: pull request on its own branch, preview address with the check, the owner merges, live site.](./route.svg)
+![Today: a clone per session, check, push to main, live site. Planned: pull request on its own branch, preview address with the check, the owner merges, live site.](./route.svg)
 
 The plan follows that. A session opens a pull request on its own branch. The pull request gets its own address, the browser check runs against it, and the screenshots are attached. Merging is the publish. Open pull requests are then the missing record of work in flight.
 
@@ -98,7 +98,7 @@ The article standard and the check cover form. The merge is where a person cover
 
 ## Not done yet
 
-Everything marked planned in the table: the always-loaded line, pull requests with previews, approval at merge. Sessions still share one folder on a machine and push straight to `main`. There is no dark mode, one project's page is still built from its README, and the home page still shows placeholder rows.
+Everything marked planned in the table: pull requests with previews, and approval at merge. Sessions still push straight to `main`. There is no dark mode, one project's page is still built from its README, and the home page still shows placeholder rows.
 
 ## Sources
 
