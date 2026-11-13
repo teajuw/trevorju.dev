@@ -1,0 +1,26 @@
+/* Every colour, font, size and spacing value on the site. Change the look here. */
+:root{
+  --bg:#faf9f5;
+  --surface:#f1efe7;
+  --raised:#ffffff;
+  --ink:#141413;
+  --ink-2:#5c5b56;
+  --ink-3:#9a9891;
+  --rule:#e4e1d7;
+  --accent:#c2613f;
+
+  --serif:"Newsreader","Iowan Old Style","Charter",Georgia,serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+  --text:19px;
+  --text-small:18px;
+  --leading:1.6;
+
+  --nav-h:56px;
+  --page:1120px;
+  --measure:680px;
+  --gutter:20px;
+  --button-radius:0;
+  --box-radius:3px;
+}

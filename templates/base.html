@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<link rel="alternate" type="text/markdown" href="{{md_url}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/tokens.css">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="nav"><div class="wrap">
+  <a class="brand" href="/">{{brand}}</a>
+  <a class="l" href="/" data-key="H"><span class="k">[H]</span>HOME</a>
+  <a class="l opt" href="{{github}}" data-key="G"><span class="k">[G]</span>GITHUB</a>
+  <a class="btn" href="/llms.txt" title="Index of every page as markdown">llms.txt</a>
+</div></header>
+
+{{body}}
+
+<nav class="spy" id="spy" aria-label="On this page" hidden>
+  <div class="spy-ticks" id="spyTicks" role="button" tabindex="0" aria-label="Sections"></div>
+  <div class="spy-panel" id="spyPanel"></div>
+</nav>
+<div class="sb" id="sb" aria-hidden="true" hidden><b id="sbT"></b></div>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

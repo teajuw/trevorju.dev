@@ -1,0 +1,11 @@
+# The few facts about the site that are not in a project repo.
+name = "Trevor Ju"
+tagline = "I build software that is checked: evals, loops and the tools around them."
+url = "https://trevorju.dev"
+github = "https://github.com/teajuw"
+repo = "https://github.com/teajuw/trevorju.dev"
+
+# Placeholder rows on the home page for projects not written up yet. Set to 0 to remove.
+blanks = 2
+blank_title = "Next project"
+blank_text = "Write-up in progress."
