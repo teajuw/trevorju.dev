@@ -1,3 +1,6 @@
 [submodule "projects/md-reader"]
 	path = projects/md-reader
 	url = https://github.com/teajuw/md-reader
+[submodule "projects/bar2vec"]
+	path = projects/bar2vec
+	url = https://github.com/teajuw/bar2vec
