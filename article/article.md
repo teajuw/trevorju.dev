@@ -21,10 +21,10 @@ The right-hand column is the design. The last column says how much of it exists 
 | Where a page comes from | Written by hand in the portfolio | Built from the project's own repo at a pinned commit | Live |
 | Who writes it up | The owner, later, from memory | The session that did the work, while it still knows why | Live |
 | Where the work happens | In the portfolio's repo | From any repo, through skills | Live |
-| How contributors coordinate | By message, or not at all | Through a shared record: pins, notes, a log | Live for finished work, not for work in flight |
+| How contributors coordinate | By message, or not at all | Through a shared record: pins, notes, a log, open pull requests | Live |
 | How a session finds the site | It has to pick the right tool | A paragraph that is always loaded tells it | Live |
-| Seeing a change first | After it is live | A preview per change, with screenshots | Planned |
-| Who checks the whole | Nobody; each page stands alone | One reader approves each change against the site's goal | Planned |
+| Seeing a change first | After it is live | A preview per change, with screenshots | Screenshots on every pull request; a preview address is planned |
+| Who checks the whole | Nobody; each page stands alone | One reader approves each change against the site's goal | Live: Trevor merges every pull request |
 | Who can read it | People with a browser | People and models: a markdown twin of every page | Live |
 | Dates and sources | Typed | Read from git | Live |
 
@@ -46,7 +46,7 @@ The 1,000-agent run had no messaging tools at all. Its agents coordinated throug
 
 Here the record is three things per project. The pin says which commit the page is built from. The notes say what an agent needs to know: what was built, what was dropped, what is parked. The log has one line per update. They are kept true cheaply: when a project moves, only the diff since the pinned commit is read, and only the notes those changes touch are edited.
 
-What is missing is the other half of those five tables. There is a log of finished work and no record of work in flight.
+The other half of those five tables, the record of work in flight, is the list of open pull requests.
 
 ## Always loaded
 
@@ -60,15 +60,15 @@ So a skill carries the procedure, and something always loaded has to say where t
 
 ## A preview per change
 
-Today a session pushes to `main` and the push is the deploy. The first time anyone sees the change on a real address, it is live.
+At first a session pushed to `main` and the push was the deploy. The first time anyone saw a change, it was live.
 
 ![Left: three agents push into one dev branch that goes live all at once. Right: three agents each get a preview; two pass and go live, one fails and stays out.](./dev-branch-vs-previews.svg)
 
 The obvious fix is a `dev` branch, or a second site for staging. None of the teams I read that run on agents does that. Anthropic's own source control discourages branches other than main and release branches, and moves the gate to just before deploy [2]. What they give each change instead is its own preview.
 
-![Today: a clone per session, check, push to main, live site. Planned: pull request on its own branch, preview address with the check, the owner merges, live site.](./route.svg)
+![Today: a clone per session, a pull request that is built and checked in a browser, the owner merges, live site. Planned: the same, with a preview address for each pull request.](./route.svg)
 
-The plan follows that. A session opens a pull request on its own branch. The pull request gets its own address, the browser check runs against it, and the screenshots are attached. Merging is the publish. Open pull requests are then the missing record of work in flight.
+The site now does the cheap half of that. A session opens a pull request on its own branch. The pull request is built and driven in a browser, and the screenshots are kept with it. Trevor merges, and the merge is the publish. What is still planned is the address: a real page for each pull request to click through, not only pictures of one.
 
 ## Owning the whole
 
@@ -78,7 +78,7 @@ Every project's session wants its own article to look good. That is the right in
 
 In Anthropic's study of agent teams, teams did better on the task and worse on ethics than a single agent on all 12 tasks, and one cause was that work was split into pieces with no agent tracking the goal of the whole [3]. A portfolio's whole is whether its claims are honest and its articles read as one body of work.
 
-The article standard and the check cover form. The merge is where a person covers the rest, and the same source control write-up describes what that review becomes: reading the intent of a change, not every line [2]. An editor that reads each new article as a sceptical outsider is an idea, not a plan.
+The article standard and the check cover form. The merge, which only Trevor does, is where a person covers the rest, and the same source control write-up describes what that review becomes: reading the intent of a change, not every line [2]. An editor that reads each new article as a sceptical outsider is an idea, not a plan.
 
 ## For models
 
@@ -98,7 +98,7 @@ The article standard and the check cover form. The merge is where a person cover
 
 ## Not done yet
 
-Everything marked planned in the table: pull requests with previews, and approval at merge. Sessions still push straight to `main`. There is no dark mode, one project's page is still built from its README, and the home page still shows placeholder rows.
+A preview address for each pull request. Nothing yet stops a session from pushing straight to `main`; the skills open a pull request, but the branch is not protected. There is no dark mode, one project's page is still built from its README, and the home page still shows placeholder rows.
 
 ## Sources
 
