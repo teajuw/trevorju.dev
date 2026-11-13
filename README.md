@@ -237,7 +237,19 @@ To work on it locally:
 ```
 git clone --recursive https://github.com/teajuw/trevorju.dev
 cd trevorju.dev
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python build.py --check
+python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m playwright install chromium
+.venv/bin/python build.py --check        # build, and check the files
+.venv/bin/python shots.py                # open it in a real browser, click things, save screenshots
 python3 -m http.server 8765 --directory _site
 ```
+
+Two checks, for two kinds of mistake. `build.py --check` reads the files: a
+missing title, a broken link, a pin with no log line. `shots.py` drives a
+browser: it confirms the stylesheet applied, hovers and clicks the section
+indicator, tries Copy for LLM, and saves screenshots at desktop and phone
+width for whoever made the change to look at. `/check` runs both on the build;
+`/publish` runs `shots.py` again on the live site after the deploy.
+
+The stylesheet and script addresses carry a hash of their contents
+(`site.css?v=…`), so a browser never pairs a new page with an old stylesheet.

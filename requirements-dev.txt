@@ -1,0 +1,4 @@
+# For shots.py, the browser check. Not needed to build the site.
+# After installing: python -m playwright install chromium
+-r requirements.txt
+playwright>=1.45
