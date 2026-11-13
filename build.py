@@ -216,7 +216,9 @@ def build():
     home = fill(
         (TPL / "home.html").read_text(), name=esc(site["name"]), tagline=esc(site["tagline"]),
         abstract=abstract_html(site.get("abstract", "")),
-        github=esc(site["github"]), github_name=esc(site["github"].rstrip("/").split("/")[-1]),
+        facts="\n".join(
+            f'      <div><dt>{label}</dt><dd><a href="{esc(site[key])}">{esc(site[key].rstrip("/").split("/")[-1])}</a></dd></div>'
+            for label, key in (("GitHub", "github"), ("LinkedIn", "linkedin")) if site.get(key)),
         rows="\n".join(rows))
     (OUT / "index.html").write_text(fill(
         base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt", brand=brand, body=home))

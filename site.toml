@@ -5,6 +5,7 @@ tagline = "Claude's human in the loop."
 abstract = "I write evals, build agents, and pit them against each other."
 url = "https://trevorju.dev"
 github = "https://github.com/teajuw"
+linkedin = "https://www.linkedin.com/in/trevorju"
 repo = "https://github.com/teajuw/trevorju.dev"
 
 # This repo is a project too, once article/article.md exists at its root.
