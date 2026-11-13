@@ -4,12 +4,12 @@
 A research pipeline that turns single-camera broadcast video of a pickleball match into a 3D scene: the court, four bodies, their paddles and the ball, in feet and seconds. It runs offline on an Apple Silicon Mac. The longer aim is a simulator that learned players can play in. It was built on one match (the PPA Brisbane 2026 men's doubles final). No licence file for its own code yet.
 
 ## Where things are
-- `article/` — the article this site builds, and its one figure.
+- `article/` — the article this site builds, its two demo videos and its one figure.
 - `calib/`, `cuts/` — camera calibration from the court lines, and the split of the broadcast into camera shots.
 - `players/` — the four players' positions on the court from a keypoint detector.
 - `ball/` — 2D ball tracking.
 - `fit3d/` — splits a rally into flights, decodes hits and bounces (`decode_events.py`), and fits each flight as a physical 3D trajectory.
-- `bodies/` — runs SAM 3D Body and GVHMR, grounds and smooths the meshes, infers the paddle (`paddle.py`), and exports the web viewer's data. `patches/sam-3d-body.patch` makes Meta's code run on Apple GPUs.
+- `bodies/` — runs SAM 3D Body and GVHMR, grounds and smooths the meshes, infers the paddle (`paddle.py`), and exports the web viewer's data. `render_demo.py` draws the scene straight to video, with no browser and no broadcast footage. `patches/sam-3d-body.patch` makes Meta's code run on Apple GPUs.
 - `paddle_seg/` — the attempt to outline paddles with SAM 2.
 - `sim/` — ball flight, bounce and paddle-impact model, fitted against tracked flights.
 - `shots/` — the table of every detected shot, the models that predict where a shot goes, court geometry, and the hand-check sample.
@@ -24,6 +24,7 @@ A research pipeline that turns single-camera broadcast video of a pickleball mat
 - Nothing runs from a fresh clone. The match video, model weights (SAM 3D Body, SMPL, SMPL-X) and the vendored repos are not in the repository; the README says where each goes.
 - Shot model, once the front stages have run: `uv run python batch/run_front.py 4`, `uv run python shots/build.py`, `uv run python shots/model.py 7`.
 - Article figure: `uv run python shots/figure.py`.
+- Article videos: `uv run --with pyvista python bodies/render_demo.py bodies/out/rally_267_grounded bodies/out/rally_267_paddle <out.mp4> 20 30 --view court` (or `broadcast`, `orbit`, `side`, `top`).
 - There are no tests. Each stage is checked by its own numbers in `RESULTS.md`.
 
 ## Tried and dropped
@@ -33,7 +34,9 @@ From the repo's write-ups and the sessions that built it:
 - Refitting drag and adding spin to the ball simulator. Neither moved its landing error by more than the noise in 13 test flights.
 - Describing a shot's target by direction and share of the available court instead of court feet. It scored 0.17 to 0.20 worse per shot, and mixing the two was no better.
 - Contact height and bounce-or-volley as inputs to the shot model. No measurable gain over hitter position.
-- A screenshot of the 3D viewer as the article's lead image. Not taken; the figure is a shot map.
+- A screenshot of the 3D viewer as the article's lead image. Not taken; the lead is now a rendered video.
+- Orbit, side and top-down demo videos. Rendered but not used; two views of the same ten seconds were enough.
+- The broadcast clip beside the render. Left out, because it would put the tour's footage on a public page.
 - The repo was first published as a card on the retired `teajuw/portfolio` site by mistake (2026-11-13).
 
 ## Parked

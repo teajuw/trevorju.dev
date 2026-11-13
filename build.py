@@ -97,7 +97,10 @@ def absolutize(page_html, p):
                 shutil.copy(image, target)
                 return f'src="/{p["slug"]}/assets/{image.name}"'
         return f'{attr}="{repo_url(p, url, attr == "src")}"'
-    return re.sub(r'(src|href)="([^"]+)"', fix, page_html)
+    page_html = re.sub(r'(src|href)="([^"]+)"', fix, page_html)
+    # An image whose file is a video becomes a silent looping player, with the alt text as its label.
+    return re.sub(r'<img alt="([^"]*)" src="([^"]+\.(?:mp4|webm))"\s*/?>',
+                  r'<video src="\2" aria-label="\1" autoplay muted loop playsinline controls></video>', page_html)
 
 
 def absolutize_md(text, p):

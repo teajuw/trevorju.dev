@@ -17,6 +17,8 @@ are different documents with different readers, so they are different files.
 └── article/
     ├── article.md         the article. Plain Markdown. The only file you write.
     └── *.png *.svg *.gif  its visuals, if any, referenced as ./name.png
+                           a video is ![what it shows](./name.mp4): the page plays it
+                           silently on a loop; keep it short and a few MB at most
 
 trevorju.dev/              (written by /sync, never by hand)
 ├── projects/<name>        the pin: the commit the page is built from
