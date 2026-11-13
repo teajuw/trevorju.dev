@@ -4,12 +4,12 @@
 A research pipeline that turns single-camera broadcast video of a pickleball match into a 3D scene: the court, four bodies, their paddles and the ball, in feet and seconds. It runs offline on an Apple Silicon Mac. The longer aim is a simulator that learned players can play in. It was built on one match (the PPA Brisbane 2026 men's doubles final). No licence file for its own code yet.
 
 ## Where things are
-- `article/` — the article this site builds, its two demo videos, the pipeline diagram and the shot-map figure. It links to the original broadcast at 287 s, which the site shows as a YouTube player.
+- `article/` — the article this site builds, its two demo videos, the pipeline diagram and the shot-map figure. It links to the original broadcast at 287 s, which the site shows as a YouTube player. `article/demo/` is the live demo the site frames at the top of the page: the interactive 3D viewer for the same ten seconds (about 5 MB of mesh data).
 - `calib/`, `cuts/` — camera calibration from the court lines, and the split of the broadcast into camera shots.
 - `players/` — the four players' positions on the court from a keypoint detector.
 - `ball/` — 2D ball tracking.
 - `fit3d/` — splits a rally into flights, decodes hits and bounces (`decode_events.py`), and fits each flight as a physical 3D trajectory.
-- `bodies/` — runs SAM 3D Body and GVHMR, grounds and smooths the meshes, infers the paddle (`paddle.py`), and exports the web viewer's data. `render_demo.py` draws the scene straight to video, with no browser and no broadcast footage. `patches/sam-3d-body.patch` makes Meta's code run on Apple GPUs.
+- `bodies/` — runs SAM 3D Body and GVHMR, grounds and smooths the meshes, infers the paddle (`paddle.py`), and exports the web viewer's data. `export_demo.py` cuts a time window out of that export for the article's live demo. `render_demo.py` draws the scene straight to video, with no browser and no broadcast footage. `patches/sam-3d-body.patch` makes Meta's code run on Apple GPUs.
 - `paddle_seg/` — the attempt to outline paddles with SAM 2.
 - `sim/` — ball flight, bounce and paddle-impact model, fitted against tracked flights.
 - `shots/` — the table of every detected shot, the models that predict where a shot goes, court geometry, and the hand-check sample.
@@ -25,6 +25,7 @@ A research pipeline that turns single-camera broadcast video of a pickleball mat
 - Shot model, once the front stages have run: `uv run python batch/run_front.py 4`, `uv run python shots/build.py`, `uv run python shots/model.py 7`.
 - Article figure: `uv run python shots/figure.py`.
 - Article videos: `uv run --with pyvista python bodies/render_demo.py bodies/out/rally_267_grounded bodies/out/rally_267_paddle <out.mp4> 20 30 --view court` (or `broadcast`, `orbit`, `side`, `top`).
+- Live demo data: `uv run python bodies/export_demo.py bodies/out/view article/demo 20 30`.
 - There are no tests. Each stage is checked by its own numbers in `RESULTS.md`.
 
 ## Tried and dropped
