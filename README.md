@@ -24,7 +24,6 @@ trevorju.dev/                 this repo; a push here is a deploy
 ├── ARTICLES.md               how an article should read
 ├── site.toml                 name, tagline, links, placeholder rows
 ├── build.py                  projects/* + notes/* + templates/ → _site/
-├── .claude/skills/           add-project, article, sync, check, publish: how the site is run
 └── .github/workflows/site.yml   on push: build → deploy to GitHub Pages
 ```
 
@@ -54,13 +53,19 @@ file, no front matter.
 
 ### What a project repo has to contain
 
-One file: `README.md`. It is the article. The first heading is the title and
-the first paragraph is the one-liner on the home page. `ARTICLES.md` says how
-one should read: open with one standalone sentence, put the key numbers before
-the first section, use visuals.
+One folder, `article/`, holding `article.md` and its images. That file is the
+article: plain Markdown, no front matter. The first heading is the title and
+the first paragraph is the one-liner on the home page. `ARTICLES.md` is the
+standard for it: open with one standalone sentence, then the key numbers, then
+a visual, then sections.
 
-If a README reads badly as an article, the fix is to the README, in the project
-repo. This site never writes to a project repo. A project's own `CLAUDE.md` or
+The article is not the README. A README says how to install and use the repo;
+an article says what the project is and what it achieved. A project with no
+`article/article.md` still gets a page, built from its README, and `/check`
+says so.
+
+If an article reads badly, the fix is in the project repo. This site never
+writes to a project repo. A project's own `CLAUDE.md` or
 `AGENTS.md` is left alone and not used by the site.
 
 Only public repos can be projects: the page links to the source, so the source
@@ -106,13 +111,21 @@ first notes from that.
 
 ### Run by skills
 
-The site is operated through five Claude Code skills in `.claude/skills/`.
-They are the only way it changes: no dashboard, no manual steps to remember.
+The site is operated through five Claude Code skills. They are the only way it
+changes: no dashboard, no manual steps to remember.
+
+The skills are not in this repo. They ship as a private plugin, `portfolio`,
+installed on Trevor's machines, so they load in every session and not only in
+this checkout. Each skill finds this repo by itself (cloning it on first use),
+which means the session that just finished work in a project repo can write
+that project's article, sync its notes and publish, with the context of the
+work still in hand. Their full names are `/portfolio:sync` and so on; the short
+names are used below.
 
 | Skill | What it does | Writes to |
 |---|---|---|
-| `/add-project <repo>` | Adds the repo as a submodule, confirms it is public and has a `README.md`, reads it once and writes the first `notes.md` and log line. | this repo |
-| `/article <repo>` | Drafts a project's README, or reviews an existing one, against `ARTICLES.md`. Works in a separate clone of the project and leaves the result for Trevor to commit there. | a project clone, never pushed |
+| `/add-project <repo>` | Adds the repo as a submodule, confirms it is public and has an article or a README, reads the repo once and writes the first `notes.md` and log line. | this repo |
+| `/article <repo>` | Writes or reviews `article/article.md` against `ARTICLES.md`. Best run in the session that did the work, inside the project repo; from the repo alone it asks Trevor for the why and the numbers. | the project repo, committed on a yes |
 | `/sync` | Pulls this repo, then for each project reads the diff since its pin, updates the notes it touches, adds a log line, moves the pin, and commits all three together. | this repo |
 | `/check` | Builds the site, fails on broken links, a missing title, a missing `.md` twin or a pin with no log line, warns on the `ARTICLES.md` rules, and takes screenshots of home and one article at phone and desktop width, then looks at them. | nothing |
 | `/publish` | Runs `/check`, then pushes. The push is the deploy. | GitHub |
@@ -144,7 +157,7 @@ trevorju.dev/llms-full.txt        the whole portfolio in one file
 
 - **View on GitHub**: a link to the repo at the exact commit the page was built from.
 - **Copy for LLM**: copies the page's `.md`. It starts with a short header
-  (repo URL, commit, last updated) and then the README, followed by the
+  (repo URL, commit, last updated) and then the article, followed by the
   project's `notes.md`.
 - **Open in Claude / ChatGPT**: opens a new chat with that `.md` URL in the prompt.
 - **Last updated 2026-11-10**: the date of the pinned commit in the project
@@ -166,7 +179,7 @@ are decided against.
 | **S** | Skills as the way the site is run (`/add-project`, `/article`, `/sync`, `/check`, `/publish`) | Every operation is a named procedure an agent runs the same way each time, and `/check` lets it see its own result. |
 | **A** | Projects as git submodules | The project list becomes the directory listing, and `git clone --recursive` hands an agent the whole body of work. Costs: a sync step and public repos only. |
 | **A** | The pin as the bookmark for notes | Notes are updated from the diff since the last pin, not from a reread of the repo, so keeping them true costs almost nothing. |
-| **A** | Article rules in one file, checked on every build | Any agent drafting a README writes it the way Trevor wants, and `/check` says when one doesn't. |
+| **A** | Article rules in one file, checked on every build | Any session writing an article knows exactly which files to make and how they open, and `/check` says when one doesn't. |
 | **A** | "Last updated" per article, from the pinned commit's date | Shows the work is alive, and cannot go stale or be faked because nobody types it. |
 | **A** | One tokens file for the whole look | "Make the accent warmer" is a one-line diff. |
 | **A** | Notes and a sync log per project, kept in this repo | An agent picking up a project knows what was done, what was dropped and what changed last, without the site ever writing to the project. |

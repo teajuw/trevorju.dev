@@ -4,10 +4,12 @@
     python build.py            build
     python build.py --check    build, then fail on errors and print warnings
 
-Every project is a git submodule under projects/. Its README.md is the article,
-its pinned commit gives the "built from" id and the "last updated" date.
+Every project is a git submodule under projects/. Its article/article.md is the
+article (README.md if there is none), and its pinned commit gives the "built
+from" id and the "last updated" date. ARTICLES.md is the standard.
 """
 import html
+import posixpath
 import re
 import shutil
 import subprocess
@@ -62,15 +64,30 @@ def inline(md_text):
     return re.sub(r"^<p>|</p>$", "", render(md_text).strip())
 
 
-def absolutize(page_html, repo, sha):
-    """Relative links and images in a README point into the repo at the pinned commit."""
+ABSOLUTE = re.compile(r"([a-z][a-z0-9+.-]*:|#|/)", re.I)
+
+
+def repo_url(p, url, raw):
+    """A link relative to the article file, as a URL into the repo at the pinned commit."""
+    path = posixpath.normpath(posixpath.join(p["base"], url))
+    host = f"https://raw.githubusercontent.com/{p['repo']}/{p['sha']}/" if raw else f"https://github.com/{p['repo']}/blob/{p['sha']}/"
+    return host + path
+
+
+def absolutize(page_html, p):
+    """Relative links and images in the rendered page point into the repo."""
     def fix(match):
         attr, url = match.group(1), match.group(2)
-        if re.match(r"([a-z][a-z0-9+.-]*:|#|/)", url, re.I):
-            return match.group(0)
-        base = f"https://raw.githubusercontent.com/{repo}/{sha}/" if attr == "src" else f"https://github.com/{repo}/blob/{sha}/"
-        return f'{attr}="{base}{url.lstrip("./")}"'
+        return match.group(0) if ABSOLUTE.match(url) else f'{attr}="{repo_url(p, url, attr == "src")}"'
     return re.sub(r'(src|href)="([^"]+)"', fix, page_html)
+
+
+def absolutize_md(text, p):
+    """The same for the markdown twin, so an LLM reader can follow every link."""
+    def fix(match):
+        bang, label, url = match.group(1), match.group(2), match.group(3)
+        return match.group(0) if ABSOLUTE.match(url) else f"{bang}[{label}]({repo_url(p, url, bool(bang))})"
+    return re.sub(r"(!?)\[([^\]]*)\]\(([^)\s]+)\)", fix, text)
 
 
 def demote(notes_text):
@@ -98,14 +115,16 @@ def load_projects(site):
         full_sha = git("rev-parse", "HEAD", cwd=folder)
         sha = full_sha[:7]
         date = datetime.strptime(git("log", "-1", "--format=%cs", cwd=folder), "%Y-%m-%d")
-        readme_path = folder / "README.md"
-        readme = readme_path.read_text() if readme_path.exists() else ""
+        # The article is article/article.md; a project without one falls back to its README.
+        source = next((f for f in ("article/article.md", "README.md") if (folder / f).exists()), "")
+        readme = (folder / source).read_text() if source else ""
         title, lede, body = split_readme(readme)
         notes_dir = ROOT / "notes" / slug
         notes = (notes_dir / "notes.md").read_text() if (notes_dir / "notes.md").exists() else ""
         log = (notes_dir / "log.md").read_text() if (notes_dir / "log.md").exists() else ""
         projects.append({
             "slug": slug, "repo": repo, "url": url, "sha": sha, "date": date,
+            "file": source, "base": posixpath.dirname(source),
             "readme": readme, "title": title or slug, "has_title": bool(title), "lede": lede, "body": body,
             "notes": notes, "log": log,
             "source_url": f"{url}/tree/{full_sha}",
@@ -119,7 +138,7 @@ def load_projects(site):
 def twin(p):
     """The page as markdown: what Copy for LLM copies and what agents fetch."""
     head = f"<!-- source: {p['source_url']} | last updated: {p['date']:%Y-%m-%d} | page: {p['page_url']} -->"
-    parts = [head, p["readme"].strip()]
+    parts = [head, absolutize_md(p["readme"].strip(), p)]
     if p["notes"]:
         parts += ["---", demote(p["notes"])]
     return "\n\n".join(parts) + "\n"
@@ -176,7 +195,7 @@ def build():
             source_url=esc(p["source_url"]), slug=p["slug"],
             claude_url="https://claude.ai/new?q=" + quote(prompt),
             page_url=esc(p["page_url"]), md_abs=esc(p["md_abs"]),
-            content=absolutize(render(p["body"]), p["repo"], p["sha"]),
+            content=absolutize(render(p["body"]), p),
         )
         (OUT / p["slug"]).mkdir()
         (OUT / p["slug"] / "index.html").write_text(fill(
@@ -202,10 +221,12 @@ def check(projects):
     for p in projects:
         s = p["slug"]
         if not p["readme"]:
-            errors.append(f"{s}: no README.md")
+            errors.append(f"{s}: no article/article.md and no README.md")
             continue
+        if p["file"] != "article/article.md":
+            warnings.append(f"{s}: no article/article.md, so the page is built from README.md")
         if not p["has_title"]:
-            errors.append(f"{s}: README has no title (a first line starting with '# ')")
+            errors.append(f"{s}: {p['file']} has no title (a first line starting with '# ')")
         if not (OUT / f"{s}.md").exists():
             errors.append(f"{s}: no markdown twin was built")
         if not p["notes"]:
@@ -215,12 +236,12 @@ def check(projects):
             errors.append(f"{s}: pinned at {p['sha']} but the newest line of notes/{s}/log.md does not name it; run /sync")
         # ARTICLES.md rules: warn, never block.
         if not p["lede"]:
-            warnings.append(f"{s}: the README does not open with one standalone sentence")
+            warnings.append(f"{s}: {p['file']} does not open with one standalone sentence")
         before_sections = p["lede"] + "\n" + p["body"].split("\n## ")[0]
         if not re.search(r"\d", re.sub(r"`[^`]*`", "", before_sections)):
             warnings.append(f"{s}: no number before the first section")
         if not re.search(r"!\[[^\]]*\]\(|<img\b|```mermaid", p["readme"]):
-            warnings.append(f"{s}: no visual in the README")
+            warnings.append(f"{s}: no visual in {p['file']}")
         elif re.search(r"!\[\]\(", p["readme"]):
             warnings.append(f"{s}: an image has no alt text")
     for page in OUT.rglob("*.html"):
