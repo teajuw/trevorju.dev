@@ -58,8 +58,8 @@ file, no front matter.
 One folder, `article/`, holding `article.md` and its images. That file is the
 article: plain Markdown, no front matter. The first heading is the title and
 the first paragraph is the one-liner on the home page. `ARTICLES.md` is the
-standard for it: open with one standalone sentence, then the key numbers, then
-a visual, then sections.
+standard for it: open with one standalone sentence, then sections, with
+visuals where they explain something the text cannot.
 
 The article is not the README. A README says how to install and use the repo;
 an article says what the project is and what it achieved. A project with no

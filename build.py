@@ -259,12 +259,8 @@ def check(projects):
         # ARTICLES.md rules: warn, never block.
         if not p["lede"]:
             warnings.append(f"{s}: {p['file']} does not open with one standalone sentence")
-        before_sections = p["lede"] + "\n" + p["body"].split("\n## ")[0]
-        if not re.search(r"\d", re.sub(r"`[^`]*`", "", before_sections)):
-            warnings.append(f"{s}: no number before the first section")
-        if not re.search(r"!\[[^\]]*\]\(|<img\b|```mermaid", p["readme"]):
-            warnings.append(f"{s}: no visual in {p['file']}")
-        elif re.search(r"!\[\]\(", p["readme"]):
+        # Whether an article needs a visual or a number is a judgement, so neither is checked.
+        if re.search(r"!\[\s*\]\(", p["readme"]):
             warnings.append(f"{s}: an image has no alt text")
     for page in OUT.rglob("*.html"):
         for url in re.findall(r'(?:href|src)="(/[^"#?]*)', page.read_text()):
