@@ -8,6 +8,7 @@ Every project is a git submodule under projects/. Its article/article.md is the
 article (README.md if there is none), and its pinned commit gives the "built
 from" id and the "last updated" date. ARTICLES.md is the standard.
 """
+import hashlib
 import html
 import posixpath
 import re
@@ -186,7 +187,10 @@ def build():
         if (ROOT / name).exists():
             shutil.copy(ROOT / name, OUT / name)
 
-    base = (TPL / "base.html").read_text()
+    # Browsers keep the stylesheet and script for ten minutes. A new page with an old
+    # stylesheet looks broken, so each build stamps their addresses with a hash of their contents.
+    stamp = hashlib.sha1(b"".join((TPL / n).read_bytes() for n in ("tokens.css", "site.css", "site.js"))).hexdigest()[:8]
+    base = (TPL / "base.html").read_text().replace("{{v}}", stamp)
     host = site["url"].split("//")[-1]
     first, _, rest = host.partition(".")
     brand = f"{esc(first)}<i>.</i>{esc(rest)}" if rest else esc(host)
