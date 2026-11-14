@@ -79,9 +79,9 @@ On the page the sentence and the abstract run together as one paragraph.
 The page then shows the repo and the last-updated date on one row under the
 abstract. Both come from git; do not write them in the file.
 
-The home page shows the name and one sentence (`abstract` in `site.toml`)
-beside the list of projects. `tagline` is the page's description and its
-summary in `llms.txt`.
+The home page opens the same way: the name, then `tagline` and `abstract`
+from `site.toml` as one paragraph. `tagline` is also the page's description
+and its summary in `llms.txt`.
 
 After that, use `##` sections. Each one becomes a dash in the page's section
 indicator, so keep their names short. Which sections to use is up to the
