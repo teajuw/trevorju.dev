@@ -33,5 +33,8 @@ standing `dev` branch or second site, and for a preview per pull request.
 
 - Done 2026-11-13 (design A): each session works in its own clone, and the
   plugin loads a paragraph into every session saying where the portfolio is.
-- Next (design B): pull requests with previews. Hosting options and a
+- Done 2026-11-14 (first half of design B): every change is a pull request
+  that is built and browser-checked, Trevor merges it, and `main` is protected
+  so a direct push is refused.
+- Next: a preview address for each pull request. Hosting options and a
   recommendation are in `research/hosting-previews.md`. Nothing is set up.

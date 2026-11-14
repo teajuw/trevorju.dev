@@ -68,7 +68,7 @@ The obvious fix is a `dev` branch, or a second site for staging. None of the tea
 
 ![Today: a clone per session, a pull request that is built and checked in a browser, the owner merges, live site. Planned: the same, with a preview address for each pull request.](./route.svg)
 
-The site now does the cheap half of that. A session opens a pull request on its own branch. The pull request is built and driven in a browser, and the screenshots are kept with it. Trevor merges, and the merge is the publish. What is still planned is the address: a real page for each pull request to click through, not only pictures of one.
+The site now does the cheap half of that. A session opens a pull request on its own branch. The pull request is built and driven in a browser, and the screenshots are kept with it. Trevor merges, and the merge is the publish. GitHub refuses a direct push to `main`, so there is no other way in. What is still planned is the address: a real page for each pull request to click through, not only pictures of one.
 
 ## Owning the whole
 
@@ -98,7 +98,7 @@ The article standard and the check cover form. The merge, which only Trevor does
 
 ## Not done yet
 
-A preview address for each pull request. Nothing yet stops a session from pushing straight to `main`; the skills open a pull request, but the branch is not protected. There is no dark mode, one project's page is still built from its README, and the home page still shows placeholder rows.
+A preview address for each pull request. There is no dark mode, one project's page is still built from its README, and the home page still shows placeholder rows.
 
 ## Sources
 
