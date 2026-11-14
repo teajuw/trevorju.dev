@@ -4,9 +4,9 @@ name = "Trevor Ju"
 # the name, then abstract as its one sentence.
 tagline = "Claude's human in the loop."
 abstract = "I write evals, build agents, and pit them against each other."
-# The words in the orange square on the home page. All but the last are cut out of
-# the square; the last sits below it. Leave empty for no square.
-motif = "human in the loop"
+# The links menu at the top right of the home page. resume is a path or address
+# to a PDF; leave it out and the menu has no résumé row.
+# resume = "/resume.pdf"
 url = "https://trevorju.dev"
 github = "https://github.com/teajuw"
 linkedin = "https://www.linkedin.com/in/trevorju"
@@ -20,3 +20,13 @@ self_slug = "portfolio"
 blanks = 2
 blank_title = "Next project"
 blank_text = "Write-up in progress."
+
+# The tabs above the project list, in order, after "All". A project appears under
+# the tab named for it in [topics]; one with no topic shows only under "All".
+tabs = ["Agents", "ML", "Tools"]
+
+[topics]
+portfolio = "Agents"
+bar2vec = "ML"
+3rd-shot = "ML"
+md-reader = "Tools"

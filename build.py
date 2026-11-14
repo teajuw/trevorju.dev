@@ -228,37 +228,34 @@ def build():
     brand = f"{esc(first)}<i>.</i>{esc(rest)}" if rest else esc(host)
 
     # home
-    # Projects are listed newest first and numbered in that order.
+    # Projects are listed newest first. A project's tab is set in site.toml under [topics].
+    topics = site.get("topics", {})
     rows = []
-    for n, p in enumerate(projects, 1):
+    for p in projects:
         rows.append(
-            f'    <a class="row" href="/{p["slug"]}/"><span class="no">{n:02d}</span>'
-            f'<span class="t">{esc(p["title"])}</span><span class="d">{inline(p["lede"])}</span></a>'
+            f'        <a class="row" href="/{p["slug"]}/" data-c="{esc(topics.get(p["slug"], ""))}">'
+            f'<span class="when">{p["date"]:%b %d, %Y}</span>'
+            f'<span class="what"><span class="t">{esc(p["title"])}</span><span class="d">{inline(p["lede"])}</span></span></a>'
         )
     for _ in range(site.get("blanks", 0)):
         rows.append(
-            '    <div class="row blank"><span class="no">—</span>'
-            f'<span class="t">{esc(site.get("blank_title", "Next project"))}</span>'
-            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span></div>'
+            '        <div class="row blank" data-c=""><span class="when">—</span>'
+            f'<span class="what"><span class="t">{esc(site.get("blank_title", "Next project"))}</span>'
+            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span></span></div>'
         )
-    # The square: every word but the last is cut out of it, the last sits below it.
-    words = site.get("motif", "").split()
-    motif = ""
-    if words:
-        inside = "".join(f'<span class="ln" style="--i:{i}">{esc(w)}</span>' for i, w in enumerate(words[:-1]))
-        motif = (f'    <div class="motif" role="img" aria-label="{esc(" ".join(words))}" style="--n:{len(words)}">'
-                 f'<div class="sq">{inside}</div>'
-                 f'<span class="ln out" style="--i:{len(words) - 1}">{esc(words[-1])}</span></div>')
+    tabs = ['          <button class="tab" type="button" aria-pressed="true" data-c="">All</button>'] + [
+        f'          <button class="tab" type="button" aria-pressed="false" data-c="{esc(t)}">{esc(t)}</button>'
+        for t in site.get("tabs", [])]
+    links = [(label, site[key], mark) for label, key, mark in
+             (("Résumé", "resume", "↓"), ("LinkedIn", "linkedin", "↗"), ("GitHub", "github", "↗")) if site.get(key)]
     def abstract_html(text):
         return " " + inline(text) if text else ""
 
     home = fill(
-        (TPL / "home.html").read_text(), name="<br>".join(esc(w) for w in site["name"].split()),
+        (TPL / "home.html").read_text(), name=esc(site["name"]),
         abstract=inline(site.get("abstract", "") or site["tagline"]),
-        links="\n".join(
-            f'        <span><a href="{esc(site[key])}">{label}</a> ↗</span>'
-            for label, key in (("GitHub", "github"), ("LinkedIn", "linkedin")) if site.get(key)),
-        motif=motif, rows="\n".join(rows))
+        links="\n".join(f'        <a href="{esc(url)}">{label}<span>{mark}</span></a>' for label, url, mark in links),
+        tabs="\n".join(tabs), rows="\n".join(rows))
     (OUT / "index.html").write_text(fill(
         base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt", brand=brand, page="home", body=home))
 
