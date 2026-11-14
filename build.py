@@ -289,6 +289,26 @@ def build():
     return site, projects
 
 
+def check_sources(text):
+    """The Sources rules in ARTICLES.md: [n] in the text and the numbered list under ## Sources agree."""
+    text = re.sub(r"```.*?```", "", text, flags=re.S)
+    heads = re.findall(r"^## +(.+?)\s*$", text, flags=re.M)
+    body, _, sources = text.partition("\n## Sources")
+    cited = {int(n) for n in re.findall(r"\[(\d+)\](?!\()", re.sub(r"`[^`\n]*`", "", body))}
+    entries = {int(n): line for n, line in re.findall(r"^(\d+)\. (.*)$", sources, flags=re.M)}
+    if not cited and "Sources" not in heads:
+        return []
+    out = []
+    if "Sources" not in heads:
+        return [f"cites {sorted(cited)} but has no ## Sources section"]
+    if heads[-1] != "Sources":
+        out.append("## Sources is not the last section")
+    out += [f"[{n}] is cited but is not in Sources" for n in sorted(cited - set(entries))]
+    out += [f"source {n} is never cited in the text" for n in sorted(set(entries) - cited)]
+    out += [f"source {n} has no link" for n, line in sorted(entries.items()) if "](http" not in line]
+    return out
+
+
 def check(projects):
     errors, warnings = [], []
     for p in projects:
@@ -317,6 +337,7 @@ def check(projects):
             errors.append(f"{s}: article/demo/ contains a symlink")
         if re.search(r"!\[\s*\]\(", p["readme"]):
             warnings.append(f"{s}: an image has no alt text")
+        warnings += [f"{s}: {w}" for w in check_sources(p["readme"])]
     for page in OUT.rglob("*.html"):
         for url in re.findall(r'(?:href|src)="(/[^"#?]*)', page.read_text()):
             target = OUT / url.lstrip("/")

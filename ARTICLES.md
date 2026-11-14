@@ -127,6 +127,40 @@ skimming reader meets them, with what each one measures and against what.
 There is no required list and no required count. If nothing has been measured,
 say nothing. Never invent or estimate a number.
 
+## Sources
+
+An article that leans on someone else's work says so, the same way every time.
+Use it where relevant: a paper the method comes from, a dataset the numbers are
+measured on, a model or tool the project runs, a study a claim rests on. An
+article that builds on nothing outside its own repo has no Sources section.
+
+```markdown
+Everything is measured on the Harmonix Set [2], a collection of ...
+
+## Sources
+
+1. [MATPAC++: Enhanced Masked Latent Prediction for Self-Supervised Audio Representation Learning](https://arxiv.org/abs/2508.12709), Quelennec et al., arXiv, August 2025.
+2. [The Harmonix Set](https://github.com/urinieto/harmonixset), Nieto et al., ISMIR 2019.
+```
+
+- **In the text**, a number in square brackets, `[2]`, goes right after the
+  claim or the name it supports, before the full stop. Cite a source where the
+  reader first meets it; cite it again only where a later claim rests on it.
+- **The section** is `## Sources`, the last section of the article, a numbered
+  list in the order the sources are first cited.
+- **Each entry** is one line: the title as a link, then who wrote or published
+  it, then where and when. `[Title](url), author or publisher, venue, Month Year.`
+  More than two authors is "First et al."
+  A few words after it may say what the article takes from it: "The beat
+  tracker."
+- **Link to the thing itself**: the paper's abstract page, the dataset's or
+  tool's repo. Open every link before publishing. Never cite from memory, and
+  never cite something the session has not read.
+- **Only what the article uses.** It is not a reading list. A source that is
+  not cited in the text does not belong in the list.
+- Say when a source is second-hand, for example a write-up of a talk and not
+  the talk.
+
 ## What `/check` looks for
 
 | Rule | Check | Result |
@@ -137,6 +171,7 @@ say nothing. Never invent or estimate a number.
 | Abstract | a second prose paragraph follows it | warn |
 | Alt text | every image has some | warn |
 | Demo | `article/demo/` holds no symlinks | error |
+| Sources | every `[n]` has an entry, every entry is cited and has a link, and `## Sources` is the last section | warn |
 
 Nothing checks for a visual or a number being present. Whether an article
 needs one is a judgement, not a rule.
@@ -151,6 +186,9 @@ needs one is a judgement, not a rule.
 
 - 2026-11-13: a project may ship a live demo, after bar2vec's section names
   turned out to be easier to judge by listening than by reading scores.
+
+- 2026-11-14: the Sources section became standard, after the site's own article
+  cited the research it rests on. bar2vec was the first project to adopt it.
 
 ## Not decided yet
 
