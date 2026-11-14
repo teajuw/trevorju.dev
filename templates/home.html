@@ -1,15 +1,29 @@
 <main class="wrap">
-  <section class="head poster grid">
+  <header class="bar grid">
+    <span class="logo" aria-hidden="true"></span>
+    <div class="dd" id="links">
+      <button class="dd-b" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="linksMenu">Links<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+      <div class="dd-m" id="linksMenu">
+{{links}}
+      </div>
+    </div>
+  </header>
+  <section class="head intro grid">
     <div class="who">
       <h1>{{name}}</h1>
       <p class="lede">{{abstract}}</p>
-      <p class="links">
-{{links}}
-      </p>
     </div>
-{{motif}}
-  </section>
-  <div class="rows" id="list">
+    <div class="work">
+      <div class="filter" id="filter" hidden>
+        <div class="tabs"><i class="sel"></i>
+{{tabs}}
+        </div>
+        <input class="search" id="search" type="search" placeholder="Search" aria-label="Search projects" autocomplete="off">
+      </div>
+      <div class="rows" id="list">
 {{rows}}
-  </div>
+        <p class="none" id="none" hidden>Nothing matches.</p>
+      </div>
+    </div>
+  </section>
 </main>

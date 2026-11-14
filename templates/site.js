@@ -145,41 +145,63 @@
     });
   });
 
-  // ---- the square on the home page ----
-  // Each word is moved left until the upright of its first letter sits on the square's left edge.
-  // Where that upright starts depends on the font, so it is read from the letter's own pixels.
-  const motif = $('.motif');
-  function fitMotif() {
-    if (!motif) return;
-    const cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true });
-    const S = 200, W = 300, family = getComputedStyle(motif).fontFamily;
-    const upright = ch => {
-      cv.width = cv.height = W;
-      cx.font = '700 ' + S + 'px ' + family;
-      cx.fillText(ch, 50, 220);
-      const d = cx.getImageData(0, 0, W, W).data, cols = [];
-      for (let x = 0; x < W; x++) { let n = 0; for (let y = 0; y < W; y++) if (d[(y * W + x) * 4 + 3] > 128) n++; cols.push(n); }
-      const tall = Math.max(...cols) * .8, x = cols.findIndex(n => n >= tall);
-      return x < 0 ? null : (x - 50) / S;
-    };
-    motif.querySelectorAll('.ln').forEach(ln => {
-      const o = upright(ln.textContent.trim()[0]);
-      if (o != null) ln.style.setProperty('--o', o.toFixed(4) + 'em');
+  // ---- home: the links menu ----
+  // Hover and keyboard focus open it in CSS. A click pins it open, for touch; a second click, a click
+  // elsewhere or Escape closes it.
+  const dd = $('#links');
+  if (dd) {
+    const b = dd.querySelector('.dd-b');
+    const set = open => { dd.classList.toggle('open', open); b.setAttribute('aria-expanded', open); };
+    b.addEventListener('click', () => {
+      const open = !dd.classList.contains('open');
+      set(open);
+      dd.classList.toggle('shut', !open);
+      if (!open) b.blur();
     });
-    // Level the top of the name's first letter with the top of the square.
-    const h1 = $('.poster h1');
-    if (!h1) return;
-    const cs = getComputedStyle(h1), F = parseFloat(cs.fontSize), line = parseFloat(cs.lineHeight);
-    cx.font = cs.fontWeight + ' ' + F + 'px ' + cs.fontFamily;
-    const m = cx.measureText(h1.textContent.trim()[0]);
-    if (!m.fontBoundingBoxAscent || !line) return;
-    const inkTop = (line - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent - m.actualBoundingBoxAscent;
-    h1.style.marginTop = (-inkTop / F).toFixed(4) + 'em';
+    dd.addEventListener('mouseleave', () => dd.classList.remove('shut'));
+    document.addEventListener('click', e => { if (!dd.contains(e.target)) set(false); });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      set(false);
+      dd.classList.add('shut');   // stays shut under a resting pointer, until it leaves
+      if (dd.contains(document.activeElement)) document.activeElement.blur();
+    });
   }
-  fitMotif();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitMotif);
 
-  const update = () => { spyUpdate(); sbUpdate(); };
+  // ---- home: tabs and search ----
+  // A row shows when it is in the chosen tab and its text contains what was typed.
+  const filter = $('#filter');
+  let placeSel = () => {};
+  if (filter) {
+    filter.hidden = false;
+    const tabs = $$('.tab'), sel = filter.querySelector('.sel'), search = $('#search'), rows = $$('#list .row'), none = $('#none');
+    let topic = '';
+    placeSel = () => {
+      const on = tabs.find(t => t.getAttribute('aria-pressed') === 'true');
+      if (!on) return;
+      sel.style.width = on.offsetWidth + 'px';
+      sel.style.transform = 'translateX(' + on.offsetLeft + 'px)';
+    };
+    const apply = () => {
+      const q = search.value.trim().toLowerCase();
+      let shown = 0;
+      rows.forEach(r => {
+        const ok = (!topic || r.dataset.c === topic) && (!q || r.textContent.toLowerCase().includes(q));
+        r.hidden = !ok;
+        if (ok) shown++;
+      });
+      none.hidden = shown > 0;
+    };
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.setAttribute('aria-pressed', x === t));
+      topic = t.dataset.c;
+      placeSel();
+      apply();
+    }));
+    search.addEventListener('input', apply);
+  }
+
+  const update = () => { spyUpdate(); sbUpdate(); placeSel(); };
   addEventListener('scroll', () => { update(); hideSel(); }, { passive: true });
   addEventListener('resize', update);
   update();
