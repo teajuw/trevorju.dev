@@ -190,7 +190,7 @@ trevorju.dev/llms-full.txt        the whole portfolio in one file
   project's `notes.md`.
 - **Open in Claude / ChatGPT**: opens a new chat with that `.md` URL in the prompt.
 - **Last updated 2026-11-10**: the date of the pinned commit in the project
-  repo, read from git, never typed. Also shown on the project's row on the home page.
+  repo, read from git, never typed. The home page lists projects newest first by this date.
 - **Built from `3f2a91c`**: a footer line, so the page can be checked against the source.
 
 ## Tier list: what "agent native" could mean here

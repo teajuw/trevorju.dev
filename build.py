@@ -228,32 +228,39 @@ def build():
     brand = f"{esc(first)}<i>.</i>{esc(rest)}" if rest else esc(host)
 
     # home
+    # Projects are listed newest first and numbered in that order.
     rows = []
-    for p in projects:
+    for n, p in enumerate(projects, 1):
         rows.append(
-            f'    <a class="row grid" href="/{p["slug"]}/">'
-            f'<span class="side mono when">{p["date"]:%b %d, %Y}</span>'
-            f'<span class="what"><span class="t">{esc(p["title"])}</span><span class="d">{inline(p["lede"])}</span></span>'
-            f'<span class="arr">→</span></a>'
+            f'    <a class="row" href="/{p["slug"]}/"><span class="no">{n:02d}</span>'
+            f'<span class="t">{esc(p["title"])}</span><span class="d">{inline(p["lede"])}</span></a>'
         )
     for _ in range(site.get("blanks", 0)):
         rows.append(
-            '    <div class="row grid blank"><span class="side mono when">—</span>'
-            f'<span class="what"><span class="t">{esc(site.get("blank_title", "Next project"))}</span>'
-            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span></span></div>'
+            '    <div class="row blank"><span class="no">—</span>'
+            f'<span class="t">{esc(site.get("blank_title", "Next project"))}</span>'
+            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span></div>'
         )
+    # The square: every word but the last is cut out of it, the last sits below it.
+    words = site.get("motif", "").split()
+    motif = ""
+    if words:
+        inside = "".join(f'<span class="ln" style="--i:{i}">{esc(w)}</span>' for i, w in enumerate(words[:-1]))
+        motif = (f'    <div class="motif" role="img" aria-label="{esc(" ".join(words))}" style="--n:{len(words)}">'
+                 f'<div class="sq">{inside}</div>'
+                 f'<span class="ln out" style="--i:{len(words) - 1}">{esc(words[-1])}</span></div>')
     def abstract_html(text):
         return " " + inline(text) if text else ""
 
     home = fill(
-        (TPL / "home.html").read_text(), name=esc(site["name"]), tagline=esc(site["tagline"]),
-        abstract=abstract_html(site.get("abstract", "")),
-        facts="\n".join(
-            f'      <div><dt>{label}</dt><dd><a href="{esc(site[key])}">{esc(site[key].rstrip("/").split("/")[-1])}</a></dd></div>'
+        (TPL / "home.html").read_text(), name="<br>".join(esc(w) for w in site["name"].split()),
+        abstract=inline(site.get("abstract", "") or site["tagline"]),
+        links="\n".join(
+            f'        <span><a href="{esc(site[key])}">{label}</a> ↗</span>'
             for label, key in (("GitHub", "github"), ("LinkedIn", "linkedin")) if site.get(key)),
-        rows="\n".join(rows))
+        motif=motif, rows="\n".join(rows))
     (OUT / "index.html").write_text(fill(
-        base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt", brand=brand, body=home))
+        base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt", brand=brand, page="home", body=home))
 
     # articles and their markdown twins
     article = (TPL / "article.html").read_text()
@@ -272,7 +279,7 @@ def build():
             shutil.copytree(p["folder"] / "article" / "demo", OUT / p["slug"] / "demo", symlinks=False)
         (OUT / p["slug"] / "index.html").write_text(fill(
             base, title=f"{esc(p['title'])} · {esc(site['name'])}", description=esc(p["lede"]),
-            md_url=f"/{p['slug']}.md", brand=brand, body=page))
+            md_url=f"/{p['slug']}.md", brand=brand, page="article", body=page))
         (OUT / f"{p['slug']}.md").write_text(twin(p))
 
     # llms.txt and llms-full.txt
