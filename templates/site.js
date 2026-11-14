@@ -8,7 +8,9 @@
     if (txt != null) e.textContent = txt;
     return e;
   };
-  document.documentElement.classList.add('js');
+  // The home page keeps the browser's own scrollbar; the other pages draw theirs.
+  const home = document.body.classList.contains('home');
+  if (!home) document.documentElement.classList.add('js');
 
   // ---- section indicator ----
   // Article: the title and each heading; a click jumps there.
@@ -55,7 +57,7 @@
   }
 
   // ---- scrollbar ----
-  const sb = $('#sb'), thumb = $('#sbT');
+  const sb = home ? null : $('#sb'), thumb = $('#sbT');
   let geo = { max: 0, travel: 0 };
   function sbUpdate() {
     if (!sb) return;
@@ -142,6 +144,40 @@
       if (f.contentWindow === e.source) f.style.height = Math.max(120, Math.min(+e.data.height || 0, 2000)) + 'px';
     });
   });
+
+  // ---- the square on the home page ----
+  // Each word is moved left until the upright of its first letter sits on the square's left edge.
+  // Where that upright starts depends on the font, so it is read from the letter's own pixels.
+  const motif = $('.motif');
+  function fitMotif() {
+    if (!motif) return;
+    const cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true });
+    const S = 200, W = 300, family = getComputedStyle(motif).fontFamily;
+    const upright = ch => {
+      cv.width = cv.height = W;
+      cx.font = '700 ' + S + 'px ' + family;
+      cx.fillText(ch, 50, 220);
+      const d = cx.getImageData(0, 0, W, W).data, cols = [];
+      for (let x = 0; x < W; x++) { let n = 0; for (let y = 0; y < W; y++) if (d[(y * W + x) * 4 + 3] > 128) n++; cols.push(n); }
+      const tall = Math.max(...cols) * .8, x = cols.findIndex(n => n >= tall);
+      return x < 0 ? null : (x - 50) / S;
+    };
+    motif.querySelectorAll('.ln').forEach(ln => {
+      const o = upright(ln.textContent.trim()[0]);
+      if (o != null) ln.style.setProperty('--o', o.toFixed(4) + 'em');
+    });
+    // Level the top of the name's first letter with the top of the square.
+    const h1 = $('.poster h1');
+    if (!h1) return;
+    const cs = getComputedStyle(h1), F = parseFloat(cs.fontSize), line = parseFloat(cs.lineHeight);
+    cx.font = cs.fontWeight + ' ' + F + 'px ' + cs.fontFamily;
+    const m = cx.measureText(h1.textContent.trim()[0]);
+    if (!m.fontBoundingBoxAscent || !line) return;
+    const inkTop = (line - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent - m.actualBoundingBoxAscent;
+    h1.style.marginTop = (-inkTop / F).toFixed(4) + 'em';
+  }
+  fitMotif();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitMotif);
 
   const update = () => { spyUpdate(); sbUpdate(); };
   addEventListener('scroll', () => { update(); hideSel(); }, { passive: true });

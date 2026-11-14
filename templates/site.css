@@ -1,10 +1,15 @@
 /* Layout and components. Values come from tokens.css.
 
    Everything sits on one 12-column grid inside the page width:
-     columns 1-2   the date column on the home page; empty on an article
-     columns 3-    text: the name, headlines, abstracts, the article
+   An article:
+     columns 1-2   empty
+     columns 3-    text: the headline, abstract and the article
    The header bar holds only the site name, on column 1. Titles are set in
    Helvetica; the facts about a page sit to the right of its opening paragraph.
+   The home page is set like a poster and has no header bar:
+     columns 1-8   the name, one sentence, two links
+     columns 10-12 the orange square with the words cut out of it
+     below         the projects: number (1), title (2-5), sentence (6-12)
    An article's section indicator is fixed at the far left of the window,
    outside the grid. */
 *{box-sizing:border-box}
@@ -49,16 +54,38 @@ video{display:block;width:100%}
 /* the sentence and the abstract run together as one paragraph */
 .head .lede{grid-column:3 / span 6;margin:0;font-size:21px;line-height:1.45;color:var(--ink-2)}
 
-/* home */
-.cols{padding:12px 0;border-bottom:1px solid var(--rule)}
-.row{padding:22px 0;border-bottom:1px solid var(--rule);align-items:baseline}
-.row .what{grid-column:3 / span 9}
-.row .t{display:block;font-size:28px;line-height:1.15;font-weight:500;letter-spacing:-.01em}
-.row .d{display:block;color:var(--ink-2);font-size:17px;line-height:1.45;margin-top:4px;max-width:36em}
-.row .arr{grid-column:12;justify-self:end;font-family:var(--mono);color:var(--ink-3);transition:transform .15s,color .15s}
+/* home: a poster. No header bar and the browser's own scrollbar. */
+.home .nav,.home .sb{display:none}
+.poster{padding:72px 0 64px;border-bottom:0}
+.poster .who{grid-column:1 / span 8}
+/* site.js replaces the top margin with a measured one, so the top of the first letter is level with the top of the square */
+.poster h1{font-size:clamp(64px,9.4vw,124px);line-height:.86;letter-spacing:-.05em;margin:-.07em 0 .32em -.04em}
+.poster .lede{font-size:21px;line-height:1.45;color:var(--ink);max-width:18em}
+.poster .links{font-family:var(--mono);font-size:13px;margin:18px 0 0;display:flex;flex-wrap:wrap;gap:6px 28px}
+.poster .links a{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+.poster .links a:hover{color:var(--accent)}
+
+/* The square. All but the last word are cut out of it in the page colour, each line moved left so the
+   upright of its first letter sits on the square's left edge (--o, measured by site.js) and then a hair
+   further (--nudge) so no sliver of orange is left. The last word sits below in ink, flush with the edge.
+   Every size is a share of the square's width, so the whole thing scales as one piece. */
+.motif{container-type:inline-size;position:relative;grid-column:10 / -1;font-family:var(--display);font-weight:700;
+  letter-spacing:-.035em;line-height:.98;--nudge:.0114em;user-select:none;-webkit-user-select:none}
+.motif .sq{position:relative;aspect-ratio:1;background:var(--accent);overflow:hidden}
+.motif .ln{position:absolute;white-space:nowrap;font-size:31.7cqw;top:calc(9cqw + var(--i) * 31.066cqw);
+  left:calc(-1 * var(--o,.07em) - var(--nudge));color:var(--bg)}
+.motif .out{left:calc(-1 * var(--o,.07em));color:var(--ink)}
+.motif::after{content:"";display:block;height:calc(var(--n) * 31.066cqw - 89cqw)}
+
+.rows{border-top:3px solid var(--ink)}
+.row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--col-gap);align-items:baseline;align-content:start;
+  min-height:104px;padding:20px 0;border-bottom:1px solid var(--ink)}
+.row .no,.row .t{font-family:var(--display);font-weight:700;font-size:26px;line-height:1.2;letter-spacing:-.015em}
+.row .no{grid-column:1}
+.row .t{grid-column:2 / span 4}
+.row .d{grid-column:6 / -1;color:var(--ink-2);font-size:20px;line-height:1.4}
 a.row:hover .t{color:var(--accent)}
-a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
-.row.blank .t,.row.blank .d,.row.blank .when{color:var(--ink-3)}
+.row.blank .no,.row.blank .t,.row.blank .d{color:var(--ink-3)}
 
 /* article */
 .body{padding-top:36px}
@@ -123,9 +150,14 @@ a.row:hover .arr{color:var(--accent);transform:translateX(4px)}
   .grid>*,.head .lede,.head .facts,.row .what,.row .arr,.prose{grid-column:1}
   .head{padding:52px 0 26px}
   .head .facts{margin-top:24px}
-  .cols{display:none}
-  .row{row-gap:6px}
-  .row .arr{display:none}
+  .poster{padding:44px 0 44px}
+  .poster .who,.motif{grid-column:1}
+  .motif{width:58%;margin:44px 0 0 0}
+  .row{grid-template-columns:2.4em minmax(0,1fr);row-gap:4px;min-height:0;padding:16px 0 18px}
+  .row .no,.row .t{font-size:22px}
+  .row .no{grid-column:1}
+  .row .t,.row .d{grid-column:2}
+  .row .d{font-size:18px}
   .body{padding-top:28px}
   .spy{top:var(--nav-h);left:0;right:0;background:color-mix(in srgb,var(--bg) 92%,transparent);
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
