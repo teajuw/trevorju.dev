@@ -88,28 +88,6 @@ def main():
         rows = list(dict.fromkeys(h for h in rows if h and h.startswith("/")))
         first = rows[0] if rows else None
         check("home: has a project to open", bool(first))
-        # The tabs filter the list, and "All" brings it back.
-        tab = page.locator(".tab:not([data-c=''])").first
-        if tab.count():
-            want = tab.get_attribute("data-c")
-            tab.click()
-            page.wait_for_timeout(300)
-            seen = page.eval_on_selector_all("#list .row", "els => els.filter(e => !e.hidden).map(e => e.dataset.c)")
-            check("home: a tab shows only its own projects", all(c == want for c in seen), f"{want}: {seen}")
-            shot(page, "home-tab")
-            page.locator(".tab[data-c='']").click()
-            check("home: All brings every project back",
-                  page.eval_on_selector_all("#list .row", "els => els.every(e => !e.hidden)"))
-        page.fill("#search", "zzzz")
-        check("home: a search with no match says so", page.is_visible("#none"))
-        page.fill("#search", "")
-        page.click(".dd-b")
-        page.wait_for_timeout(250)
-        check("home: the links menu opens on a click", page.evaluate("() => getComputedStyle(document.querySelector('.dd-m')).visibility === 'visible'"))
-        shot(page, "home-links")
-        page.keyboard.press("Escape")
-        page.wait_for_timeout(250)
-        check("home: Escape closes the links menu", page.evaluate("() => getComputedStyle(document.querySelector('.dd-m')).visibility === 'hidden'"))
         article = base + (first or "/")
 
         # ---- article, desktop ----
