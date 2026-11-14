@@ -1,0 +1,51 @@
+name: check
+
+# Every change reaches main through a pull request. This builds the pull request,
+# validates it, drives it in a real browser, and keeps the screenshots, so the
+# person approving the merge can see what they are approving.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Build and validate
+        run: |
+          set -o pipefail
+          python build.py --check 2>&1 | tee check.txt
+      - name: Browser check
+        run: |
+          set -o pipefail
+          python shots.py --out shots 2>&1 | tee -a check.txt
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo '```'
+            cat check.txt 2>/dev/null || echo 'no output'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: shots
+          if-no-files-found: ignore

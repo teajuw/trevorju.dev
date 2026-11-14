@@ -5,7 +5,7 @@
 ## How it works
 
 ```
-trevorju.dev/                 this repo; a push here is a deploy
+trevorju.dev/                 this repo; a merge to main here is a deploy
 ├── projects/
 │   ├── job-agent    @ 3f2a91c   ← not a folder: a pointer to a commit in github.com/teajuw/job-agent
 │   ├── md-reader    @ 9be04d7   ← same
@@ -26,7 +26,8 @@ trevorju.dev/                 this repo; a push here is a deploy
 ├── ARTICLES.md               how an article should read
 ├── site.toml                 name, tagline, links, placeholder rows
 ├── build.py                  projects/* + notes/* + templates/ → _site/
-└── .github/workflows/site.yml   on push: build → deploy to GitHub Pages
+├── .github/workflows/check.yml  on a pull request: build, browser check, screenshots
+└── .github/workflows/site.yml   on main: build → deploy to GitHub Pages
 ```
 
 (The three project names are examples. The real list is whatever is under `projects/`.)
@@ -150,7 +151,7 @@ names are used below.
 | `/article <repo>` | Writes or reviews `article/article.md` against `ARTICLES.md`. Best run in the session that did the work, inside the project repo; from the repo alone it asks Trevor for the why and the numbers. | the project repo, committed on a yes |
 | `/sync` | Pulls this repo, then for each project reads the diff since its pin, updates the notes it touches, adds a log line, moves the pin, and commits all three together. | this repo |
 | `/check` | Builds the site, fails on broken links, a missing title, a missing `.md` twin or a pin with no log line, warns on the `ARTICLES.md` rules, and takes screenshots of home and one article at phone and desktop width, then looks at them. | nothing |
-| `/publish` | Runs `/check`, then pushes. The push is the deploy. | GitHub |
+| `/publish` | Runs `/check`, opens a pull request, and shows its screenshots. Trevor merges; the merge is the deploy. | GitHub |
 | `/archive <repo>` | Moves a project to `archive/` with a log line, or moves it back. | this repo |
 
 The usual run is `/sync`, look, `/publish`. A design change is an edit to a
@@ -163,9 +164,14 @@ Publishing is on demand. A push to a project repo changes nothing here until
 
 ```
 /publish
-        │  push what /sync committed       the history of this repo is the history of the site
+        │  open a pull request             open pull requests are the work in flight
         ▼
-site.yml (on push)
+check.yml (on the pull request)
+        │  build.py --check, shots.py      screenshots kept with the run
+        ▼
+Trevor merges                     the history of this repo is the history of the site
+        ▼
+site.yml (on main)
         │  build.py                        one article per submodule, plus home
         │  deploy _site/ to GitHub Pages
         ▼
