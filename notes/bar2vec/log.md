@@ -1,5 +1,6 @@
 # bar2vec sync log
 
+2026-11-14  d30f446 → d3d268f  Step-by-step figure (sound to named sections) replaces the colour strip; six-step list under it. Notes: Where things are.
 2026-11-13  0b04337 → d30f446  Article explains how the figure's colours are made (PCA to three directions, shown as red, green, blue). Notes: no change.
 2026-11-13  abfd65b → 0b04337  Figure added under the demo: one song's bars coloured by their embeddings. Notes: Where things are.
 2026-11-13  e699431 → abfd65b  Article leads with "nobody told it" and defines its terms; demo sections now line up with the playhead. Notes: Where things are, Parked.
