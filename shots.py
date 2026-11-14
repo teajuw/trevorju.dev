@@ -84,7 +84,9 @@ def main():
         check("home: no section indicator", page.evaluate("() => document.querySelector('#spy').hidden"))
         check("home: no sideways scroll", page.evaluate("() => document.documentElement.scrollWidth <= innerWidth"))
         shot(page, "home-desktop")
-        first = page.get_attribute("a.row", "href")
+        rows = page.eval_on_selector_all("a.row", "els => els.map(e => e.getAttribute('href'))")
+        rows = list(dict.fromkeys(h for h in rows if h and h.startswith("/")))
+        first = rows[0] if rows else None
         check("home: has a project to open", bool(first))
         article = base + (first or "/")
 
@@ -99,15 +101,6 @@ def main():
             " return [t.left - r.left - parseFloat(s.paddingLeft), r.right - parseFloat(s.paddingRight) - t.right]; }")
         check("article: the text column is centred on the page", abs(gaps[0] - gaps[1]) <= 2,
               f"left {gaps[0]:.0f}px, right {gaps[1]:.0f}px")
-
-        # A project's live demo sits in a frame at the top of the article and sets its own height.
-        if page.locator("iframe.demo").count():
-            page.wait_for_timeout(1500)
-            inner = page.frame_locator("iframe.demo").locator("body").evaluate("b => b.scrollHeight")
-            outer = page.evaluate("() => document.querySelector('iframe.demo').getBoundingClientRect().height")
-            check("demo: the frame loaded", inner > 100, f"content {inner}px tall")
-            check("demo: the frame is as tall as its content", abs(inner - outer) <= 4, f"content {inner}px, frame {outer:.0f}px")
-            shot(page, "article-demo")
 
         sections = page.locator("#spyPanel a").count()
         check("article: indicator lists the sections", sections > 1, f"{sections} found")
@@ -138,6 +131,29 @@ def main():
             page.wait_for_timeout(300)
             copied = page.evaluate("() => navigator.clipboard.readText()")
             check("copy for LLM: puts the page's markdown on the clipboard", copied.startswith("<!-- source:"), copied[:40])
+        ctx.close()
+
+        # ---- demos ----
+        # A project's live demo sits in a frame at the top of its article and sets its own height.
+        # Every project page is opened, so a demo is tested wherever it sits in the home page's order.
+        ctx = browser.new_context(viewport=DESKTOP)
+        page = ctx.new_page()
+        demos = 0
+        for href in rows:
+            page.goto(base + href, wait_until="networkidle")
+            if not page.locator("iframe.demo").count():
+                continue
+            demos += 1
+            slug = href.strip("/")
+            page.wait_for_timeout(1500)
+            inner = page.frame_locator("iframe.demo").locator("body").evaluate("b => b.scrollHeight")
+            outer = page.evaluate("() => document.querySelector('iframe.demo').getBoundingClientRect().height")
+            check(f"demo {slug}: the frame loaded", inner > 100, f"content {inner}px tall")
+            check(f"demo {slug}: the frame is as tall as its content", abs(inner - outer) <= 4,
+                  f"content {inner}px, frame {outer:.0f}px")
+            shot(page, f"demo-{slug}")
+        if not demos:
+            print("note  no project page has a demo, so no demo was checked")
         ctx.close()
 
         # ---- phone ----
