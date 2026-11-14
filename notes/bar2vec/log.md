@@ -1,5 +1,6 @@
 # bar2vec sync log
 
+2026-11-14  be640a3 → 51fbe13  Demo animation now goes inside the audio model: patches, layers, joining and averaging. Notes: Where things are.
 2026-11-14  207a81b → be640a3  Demo gains a second tab: an animation following one bar from sound to its colour. Notes: Where things are.
 2026-11-14  d3d268f → 207a81b  Article cites its five sources (MATPAC++, Harmonix Set, CLAP, Marmoret, Beat This!) and ends with a Sources section. Notes: Where things are.
 2026-11-14  d30f446 → d3d268f  Step-by-step figure (sound to named sections) replaces the colour strip; six-step list under it. Notes: Where things are.
