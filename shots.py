@@ -99,30 +99,24 @@ def main():
             "() => { const t = document.querySelector('.prose').getBoundingClientRect(),"
             " w = document.querySelector('.wrap'), s = getComputedStyle(w), r = w.getBoundingClientRect();"
             " return [t.left - r.left - parseFloat(s.paddingLeft), r.right - parseFloat(s.paddingRight) - t.right]; }")
-        check("article: the text column is centred on the page", abs(gaps[0] - gaps[1]) <= 2,
+        check("article: the text starts on the page's left edge", abs(gaps[0]) <= 2,
               f"left {gaps[0]:.0f}px, right {gaps[1]:.0f}px")
 
         sections = page.locator("#spyPanel a").count()
         check("article: indicator lists the sections", sections > 1, f"{sections} found")
         if sections > 1:
-            page.hover("#spyTicks")
-            page.wait_for_timeout(300)
-            check("indicator: opens on hover", panel_shown(page))
-            shot(page, "article-indicator-open")
-            # Click the last section and leave the pointer exactly where it is.
+            check("contents: listed without hovering", panel_shown(page))
+            clear = page.evaluate(
+                "() => document.querySelector('#spy').getBoundingClientRect().left"
+                " >= document.querySelector('.prose').getBoundingClientRect().right")
+            check("contents: sits to the right of the text", clear)
             page.locator("#spyPanel a").last.click()
-            page.wait_for_timeout(60)
-            check("indicator: closes the moment a section is chosen", not panel_shown(page))
-            page.wait_for_timeout(900)
-            check("indicator: stays closed while the pointer rests there", not panel_shown(page))
-            check("indicator: the page jumped", page.evaluate("() => scrollY > 100"), "scrollY did not move")
+            page.wait_for_timeout(2500)  # the jump scrolls smoothly; let it finish
+            check("contents: a click jumps the page", page.evaluate("() => scrollY > 100"), "scrollY did not move")
+            check("contents: still listed after the jump", panel_shown(page))
+            check("contents: marks the section in view",
+                  page.evaluate("() => document.querySelector('#spyPanel a:last-child').classList.contains('on')"))
             shot(page, "article-after-jump")
-            page.mouse.move(700, 500)
-            page.wait_for_timeout(100)
-            page.hover("#spyTicks")
-            page.wait_for_timeout(300)
-            check("indicator: opens again after the pointer leaves and returns", panel_shown(page))
-            page.mouse.move(700, 500)
 
         ctx.grant_permissions(["clipboard-read", "clipboard-write"])
         page.goto(article, wait_until="networkidle")
