@@ -9,19 +9,19 @@
   --rule:#e4e1d7;
   --accent:#c2613f;
 
-  --display:"Helvetica Neue",Helvetica,Arial,sans-serif;   /* the name, titles and the small facts */
-  --serif:"Newsreader","Iowan Old Style","Charter",Georgia,serif;
-  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
-  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  /* Three fonts, one job each. */
+  --serif:"Newsreader","Iowan Old Style","Charter",Georgia,serif;        /* anything read: headlines, titles, text */
+  --ui:"Instrument Sans","Helvetica Neue",Helvetica,Arial,sans-serif;    /* anything clicked or scanned: bar, links, labels, facts */
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;        /* code only */
 
   --text:20px;
   --text-small:18px;
   --leading:1.6;
 
-  --nav-h:56px;
+  --nav-h:64px;
   --page:1120px;
   --col-gap:24px;
   --gutter:20px;
-  --button-radius:0;
+  --button-radius:8px;
   --box-radius:3px;
 }

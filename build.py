@@ -190,7 +190,12 @@ def load_projects(site):
         projects.append(read_project(site, ROOT / path, Path(path).name, url))
     if (ROOT / "article" / "article.md").exists():
         projects.append(read_project(site, ROOT, site.get("self_slug", "portfolio"), site["repo"], is_self=True))
+    # Pinned projects first, in the order site.toml gives; the rest most recently updated first.
+    pinned = site.get("pinned", [])
+    for p in projects:
+        p["pinned"] = p["slug"] in pinned
     projects.sort(key=lambda p: p["date"], reverse=True)
+    projects.sort(key=lambda p: pinned.index(p["slug"]) if p["pinned"] else len(pinned))
     return projects
 
 
@@ -225,31 +230,35 @@ def build():
     base = (TPL / "base.html").read_text().replace("{{v}}", stamp)
     host = site["url"].split("//")[-1]
     first, _, rest = host.partition(".")
-    brand = f"{esc(first)}<i>.</i>{esc(rest)}" if rest else esc(host)
+    brand = esc(host)
+    links = [(label, site[key]) for label, key in (("GitHub", "github"), ("LinkedIn", "linkedin")) if site.get(key)]
+    base = base.replace("{{navlinks}}", "".join(f'<a href="{esc(url)}">{label}</a>' for label, url in links))
 
     # home
-    # Projects are listed newest first and numbered in that order.
+    # Pinned projects carry the square; every row ends with the date it was last updated.
+    this_year = max(p["date"] for p in projects).year if projects else 0
     rows = []
-    for n, p in enumerate(projects, 1):
+    for p in projects:
+        when = f"{p['date']:%b} {p['date'].day}" + ("" if p["date"].year == this_year else f", {p['date'].year}")
+        mark = '<span class="pin" role="img" aria-label="Pinned"></span>' if p["pinned"] else '<span class="pin"></span>'
         rows.append(
-            f'    <a class="row" href="/{p["slug"]}/"><span class="no">{n:02d}</span>'
-            f'<span class="t">{esc(p["title"])}</span><span class="d">{inline(p["lede"])}</span></a>'
+            f'    <a class="row" href="/{p["slug"]}/">{mark}<span class="t">{esc(p["title"])}</span>'
+            f'<span class="d">{inline(p["lede"])}</span><time class="u" datetime="{p["date"]:%Y-%m-%d}">{when}</time></a>'
         )
     for _ in range(site.get("blanks", 0)):
         rows.append(
-            '    <div class="row blank"><span class="no">—</span>'
+            '    <div class="row blank"><span class="pin"></span>'
             f'<span class="t">{esc(site.get("blank_title", "Next project"))}</span>'
-            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span></div>'
+            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span><span class="u"></span></div>'
         )
     def abstract_html(text):
         return " " + inline(text) if text else ""
 
     home = fill(
-        (TPL / "home.html").read_text(), name=esc(site["name"]), tagline=esc(site["tagline"]),
-        abstract=abstract_html(site.get("abstract", "")),
-        links="\n".join(
-            f'        <span><a href="{esc(site[key])}">{label}</a> ↗</span>'
-            for label, key in (("GitHub", "github"), ("LinkedIn", "linkedin")) if site.get(key)),
+        (TPL / "home.html").read_text(), tagline=esc(site["tagline"]),
+        abstract=inline(site.get("abstract", "")),
+        buttons="\n".join(
+            f'      <a class="btn{"" if n == 0 else " o"}" href="{esc(url)}">{label}</a>' for n, (label, url) in enumerate(links)),
         rows="\n".join(rows))
     (OUT / "index.html").write_text(fill(
         base, title=esc(site["name"]), description=esc(site["tagline"]), md_url="/llms.txt", brand=brand, page="home", body=home))
@@ -310,6 +319,10 @@ def check_sources(text):
 
 def check(projects):
     errors, warnings = [], []
+    known = {p["slug"] for p in projects}
+    for name in tomllib.loads((ROOT / "site.toml").read_text()).get("pinned", []):
+        if name not in known:
+            errors.append(f"site.toml pins '{name}', which is not a project on the site")
     for p in projects:
         s = p["slug"]
         if not p["readme"]:

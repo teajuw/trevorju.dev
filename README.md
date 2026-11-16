@@ -24,7 +24,7 @@ trevorju.dev/                 this repo; a merge to main here is a deploy
 │   ├── site.css              layout and components, built on the tokens
 │   └── site.js               section indicator, scrollbar, copy buttons; pages read without it
 ├── ARTICLES.md               how an article should read
-├── site.toml                 name, tagline, links, placeholder rows
+├── site.toml                 name, tagline, links, pinned projects
 ├── build.py                  projects/* + notes/* + templates/ → _site/
 ├── .github/workflows/check.yml  on a pull request: build, browser check, screenshots
 └── .github/workflows/site.yml   on main: build → deploy to GitHub Pages
@@ -190,7 +190,7 @@ trevorju.dev/llms-full.txt        the whole portfolio in one file
   project's `notes.md`.
 - **Open in Claude / ChatGPT**: opens a new chat with that `.md` URL in the prompt.
 - **Last updated 2026-11-10**: the date of the pinned commit in the project
-  repo, read from git, never typed. The home page lists projects newest first by this date.
+  repo, read from git, never typed. The home page lists the projects pinned in `site.toml` first, in that order, then the rest newest first by this date.
 - **Built from `3f2a91c`**: a footer line, so the page can be checked against the source.
 
 ## Tier list: what "agent native" could mean here
@@ -235,8 +235,7 @@ are decided against.
 
 ## Status
 
-Built and deployed with one project, md-reader, and two placeholder rows
-(`blanks` in `site.toml`). Not done yet: more projects, dark mode, a resume link.
+Built and deployed with four projects. Not done yet: more projects, dark mode, a resume link.
 
 To work on it locally:
 

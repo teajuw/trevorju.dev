@@ -1,14 +1,13 @@
 <main class="wrap">
-  <section class="head intro">
-    <div class="top">
-      <h1>{{name}}<span class="logo" aria-hidden="true"></span></h1>
-      <p class="links">
-{{links}}
-      </p>
-    </div>
-    <p class="lede">{{tagline}}{{abstract}}</p>
+  <section class="head hero">
+    <h1>{{tagline}}</h1>
+    <p class="lede">{{abstract}}</p>
+    <p class="cta">
+{{buttons}}
+    </p>
   </section>
-  <div class="rows" id="list">
+  <div class="tbl" id="list">
+    <div class="thead"><span>Projects</span><span>Updated</span></div>
 {{rows}}
   </div>
 </main>

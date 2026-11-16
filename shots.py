@@ -88,6 +88,12 @@ def main():
         rows = list(dict.fromkeys(h for h in rows if h and h.startswith("/")))
         first = rows[0] if rows else None
         check("home: has a project to open", bool(first))
+        marks = page.eval_on_selector_all("a.row", "els => els.map(e => !!e.querySelector('.pin[role]'))")
+        check("home: pinned projects come before the rest", marks == sorted(marks, reverse=True), str(marks))
+        dates = page.eval_on_selector_all("a.row", "els => els.filter(e => !e.querySelector('.pin[role]')).map(e => e.querySelector('time').dateTime)")
+        check("home: the rest are most recently updated first", dates == sorted(dates, reverse=True), str(dates))
+        check("home: every row shows when it was updated", page.evaluate(
+            "() => [...document.querySelectorAll('a.row time')].every(t => t.textContent.trim() && t.getBoundingClientRect().width > 0)"))
         article = base + (first or "/")
 
         # ---- article, desktop ----
@@ -134,7 +140,8 @@ def main():
         page = ctx.new_page()
         demos = 0
         for href in rows:
-            page.goto(base + href, wait_until="networkidle")
+            # "load", not "networkidle": a page with videos keeps fetching and may never go idle.
+            page.goto(base + href, wait_until="load")
             if not page.locator("iframe.demo").count():
                 continue
             demos += 1
