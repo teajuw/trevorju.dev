@@ -99,7 +99,7 @@ def main():
             "() => { const t = document.querySelector('.prose').getBoundingClientRect(),"
             " w = document.querySelector('.wrap'), s = getComputedStyle(w), r = w.getBoundingClientRect();"
             " return [t.left - r.left - parseFloat(s.paddingLeft), r.right - parseFloat(s.paddingRight) - t.right]; }")
-        check("article: the text column is centred on the page", abs(gaps[0] - gaps[1]) <= 2,
+        check("article: the text starts on the page's left edge", abs(gaps[0]) <= 2,
               f"left {gaps[0]:.0f}px, right {gaps[1]:.0f}px")
 
         sections = page.locator("#spyPanel a").count()
