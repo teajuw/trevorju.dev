@@ -1,5 +1,6 @@
 # bar2vec sync log
 
+2026-11-16  e5cef14 → 7810f49  Demo tabs replaced by two stacked parts (listen, then how it works); article cut to about 1,250 words; static step figure removed. Notes: Where things are, Tried and dropped.
 2026-11-16  51fbe13 → e5cef14  Demo gains a search box over a catalogue of 265 chart songs. Notes: Where things are, Tried and dropped, Parked.
 2026-11-14  be640a3 → 51fbe13  Demo animation now goes inside the audio model: patches, layers, joining and averaging. Notes: Where things are.
 2026-11-14  207a81b → be640a3  Demo gains a second tab: an animation following one bar from sound to its colour. Notes: Where things are.
