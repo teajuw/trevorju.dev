@@ -90,10 +90,11 @@ def main():
         check("home: has a project to open", bool(first))
         marks = page.eval_on_selector_all("a.row", "els => els.map(e => !!e.querySelector('.pin[role]'))")
         check("home: pinned projects come before the rest", marks == sorted(marks, reverse=True), str(marks))
-        dates = page.eval_on_selector_all("a.row", "els => els.filter(e => !e.querySelector('.pin[role]')).map(e => e.querySelector('time').dateTime)")
-        check("home: the rest are most recently updated first", dates == sorted(dates, reverse=True), str(dates))
-        check("home: every row shows when it was updated", page.evaluate(
-            "() => [...document.querySelectorAll('a.row time')].every(t => t.textContent.trim() && t.getBoundingClientRect().width > 0)"))
+        dates = page.eval_on_selector_all("a.row", "els => els.filter(e => !e.querySelector('.pin[role]')).map(e => e.dataset.updated)")
+        check("home: the rest are most recently updated first", all(dates) and dates == sorted(dates, reverse=True), str(dates))
+        check("home: titles and sentences start on the same left edge", page.evaluate(
+            "() => { const l = e => Math.round(e.getBoundingClientRect().left), h = l(document.querySelector('.hero h1'));"
+            " return [...document.querySelectorAll('.row .t, .row .d')].every(e => l(e) === h); }"))
         article = base + (first or "/")
 
         # ---- article, desktop ----

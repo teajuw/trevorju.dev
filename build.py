@@ -235,21 +235,19 @@ def build():
     base = base.replace("{{navlinks}}", "".join(f'<a href="{esc(url)}">{label}</a>' for label, url in links))
 
     # home
-    # Pinned projects carry the square; every row ends with the date it was last updated.
-    this_year = max(p["date"] for p in projects).year if projects else 0
+    # Each row is a title with its sentence under it; a pinned project has the square after its title.
     rows = []
     for p in projects:
-        when = f"{p['date']:%b} {p['date'].day}" + ("" if p["date"].year == this_year else f", {p['date'].year}")
-        mark = '<span class="pin" role="img" aria-label="Pinned"></span>' if p["pinned"] else '<span class="pin"></span>'
+        mark = '<i class="pin" role="img" aria-label="Pinned"></i>' if p["pinned"] else ""
         rows.append(
-            f'    <a class="row" href="/{p["slug"]}/">{mark}<span class="t">{esc(p["title"])}</span>'
-            f'<span class="d">{inline(p["lede"])}</span><time class="u" datetime="{p["date"]:%Y-%m-%d}">{when}</time></a>'
+            f'    <a class="row" href="/{p["slug"]}/" data-updated="{p["date"]:%Y-%m-%d}">'
+            f'<span class="t">{esc(p["title"])}{mark}</span><span class="d">{inline(p["lede"])}</span></a>'
         )
     for _ in range(site.get("blanks", 0)):
         rows.append(
-            '    <div class="row blank"><span class="pin"></span>'
+            '    <div class="row blank">'
             f'<span class="t">{esc(site.get("blank_title", "Next project"))}</span>'
-            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span><span class="u"></span></div>'
+            f'<span class="d">{esc(site.get("blank_text", "Write-up in progress."))}</span></div>'
         )
     def abstract_html(text):
         return " " + inline(text) if text else ""
