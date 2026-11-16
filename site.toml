@@ -1,9 +1,9 @@
 # The few facts about the site that are not in a project repo.
 name = "Trevor Ju"
-# The home page shows the name, then tagline and abstract as one paragraph.
+# The home page opens with tagline as its headline and abstract as the sentence under it.
 # tagline is also the page description and the summary in llms.txt.
-tagline = "Claude's human in the loop."
-abstract = "I write evals, build agents, and pit them against each other."
+tagline = "Aspiring human in the loop."
+abstract = "I write evals, build agents, and judge what happens."
 url = "https://trevorju.dev"
 github = "https://github.com/teajuw"
 linkedin = "https://www.linkedin.com/in/trevorju"
@@ -13,7 +13,11 @@ repo = "https://github.com/teajuw/trevorju.dev"
 # Its page is served at /<self_slug>/.
 self_slug = "portfolio"
 
+# Projects pinned to the top of the home page, in this order (folder names under projects/,
+# or self_slug for this repo). Every other project follows, most recently updated first.
+pinned = ["3rd-shot", "bar2vec"]
+
 # Placeholder rows on the home page for projects not written up yet. Set to 0 to remove.
-blanks = 2
+blanks = 0
 blank_title = "Next project"
 blank_text = "Write-up in progress."

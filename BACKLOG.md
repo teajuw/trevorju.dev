@@ -3,6 +3,19 @@
 Things asked for and set aside, newest first. Each entry keeps the ask in Trevor's
 terms so a later session can pick it up without the conversation it came from.
 
+## 2026-11-16 · Home page as picture cards
+
+**The ask.** A home page where every project is a large card with a real picture
+from the project (bar2vec's colour strip, 3rd-shot's 3D court), two per row, and
+an article page that opens on a full-width picture.
+
+**Trevor's verdict.** "Save this as an option but I think it's too much." The home
+page went to a table with pinned projects instead.
+
+**To pick it up.** Each project needs a picture made for its card: bar2vec's demo
+does not crop well, and md-reader has only its app icon. A project would name its
+card picture in its own repo.
+
 ## 2026-11-13 · Dev and prod for a site that agents post to
 
 **Where the project is heading.** The portfolio is turning into a shared, deployed
