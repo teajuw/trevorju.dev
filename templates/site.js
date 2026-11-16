@@ -145,63 +145,7 @@
     });
   });
 
-  // ---- home: the links menu ----
-  // Hover and keyboard focus open it in CSS. A click pins it open, for touch; a second click, a click
-  // elsewhere or Escape closes it.
-  const dd = $('#links');
-  if (dd) {
-    const b = dd.querySelector('.dd-b');
-    const set = open => { dd.classList.toggle('open', open); b.setAttribute('aria-expanded', open); };
-    b.addEventListener('click', () => {
-      const open = !dd.classList.contains('open');
-      set(open);
-      dd.classList.toggle('shut', !open);
-      if (!open) b.blur();
-    });
-    dd.addEventListener('mouseleave', () => dd.classList.remove('shut'));
-    document.addEventListener('click', e => { if (!dd.contains(e.target)) set(false); });
-    document.addEventListener('keydown', e => {
-      if (e.key !== 'Escape') return;
-      set(false);
-      dd.classList.add('shut');   // stays shut under a resting pointer, until it leaves
-      if (dd.contains(document.activeElement)) document.activeElement.blur();
-    });
-  }
-
-  // ---- home: tabs and search ----
-  // A row shows when it is in the chosen tab and its text contains what was typed.
-  const filter = $('#filter');
-  let placeSel = () => {};
-  if (filter) {
-    filter.hidden = false;
-    const tabs = $$('.tab'), sel = filter.querySelector('.sel'), search = $('#search'), rows = $$('#list .row'), none = $('#none');
-    let topic = '';
-    placeSel = () => {
-      const on = tabs.find(t => t.getAttribute('aria-pressed') === 'true');
-      if (!on) return;
-      sel.style.width = on.offsetWidth + 'px';
-      sel.style.transform = 'translateX(' + on.offsetLeft + 'px)';
-    };
-    const apply = () => {
-      const q = search.value.trim().toLowerCase();
-      let shown = 0;
-      rows.forEach(r => {
-        const ok = (!topic || r.dataset.c === topic) && (!q || r.textContent.toLowerCase().includes(q));
-        r.hidden = !ok;
-        if (ok) shown++;
-      });
-      none.hidden = shown > 0;
-    };
-    tabs.forEach(t => t.addEventListener('click', () => {
-      tabs.forEach(x => x.setAttribute('aria-pressed', x === t));
-      topic = t.dataset.c;
-      placeSel();
-      apply();
-    }));
-    search.addEventListener('input', apply);
-  }
-
-  const update = () => { spyUpdate(); sbUpdate(); placeSel(); };
+  const update = () => { spyUpdate(); sbUpdate(); };
   addEventListener('scroll', () => { update(); hideSel(); }, { passive: true });
   addEventListener('resize', update);
   update();

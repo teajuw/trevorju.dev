@@ -6,10 +6,9 @@
      columns 3-    text: the headline, abstract and the article
    The header bar holds only the site name, on column 1. Titles are set in
    Helvetica; the facts about a page sit to the right of its opening paragraph.
-   The home page has its own top bar and no header bar:
-     top bar       the orange square on column 1, as far from the top as from the left; the links menu at the right
-     columns 1-4   the name, and one sentence no wider than the name
-     columns 5-12  the tabs and search, then the projects: date, title, sentence */
+   The home page has no header bar. A small orange square sits in the left margin beside the
+   name, exactly as tall as the name's capitals; everything else lines up with the name:
+   the two sentences, two links at the right, then the projects as number, title, sentence. */
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
@@ -52,56 +51,32 @@ video{display:block;width:100%}
 /* the sentence and the abstract run together as one paragraph */
 .head .lede{grid-column:3 / span 6;margin:0;font-size:21px;line-height:1.45;color:var(--ink-2)}
 
-/* home. Its own top bar, and the browser's own scrollbar. */
-.home{--edge:clamp(20px,4vw,56px)}
+/* home. No header bar, and the browser's own scrollbar. */
+.home{--edge:clamp(20px,4vw,56px);--name:clamp(34px,4.2vw,56px);
+  --mark:calc(var(--name) * .716);                 /* the height of a Helvetica capital */
+  --indent:calc(var(--mark) + var(--name) * .55)}  /* the square and the gap after it */
 .home .nav,.home .sb{display:none}
-.home .wrap{max-width:1440px;padding:0 var(--edge)}
-.bar{padding-top:var(--edge);align-items:start}
-.logo{grid-column:1;aspect-ratio:1;background:var(--accent)}
+.home .wrap{max-width:1440px;padding:0 var(--edge) 0 calc(var(--edge) + var(--indent))}
+/* the capitals start a little below the top of their line, so the square ends up as far from the top as from the left */
+.intro{padding:calc(var(--edge) - var(--name) * .15) 0 0;border-bottom:0}
+.intro .top{display:flex;justify-content:space-between;align-items:baseline;gap:24px}
+/* the square hangs in the margin and sits on the name's baseline */
+.intro h1{display:flex;align-items:baseline;font-size:var(--name);line-height:1;letter-spacing:-.02em;text-transform:uppercase;
+  white-space:nowrap;margin:0 0 0 calc(-1 * var(--indent))}
+.logo{flex:none;width:var(--mark);height:var(--mark);margin-right:calc(var(--name) * .55);background:var(--accent)}
+.intro .links{font-family:var(--mono);font-size:13px;margin:0;display:flex;gap:28px;white-space:nowrap}
+.intro .links a{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+.intro .links a:hover{color:var(--accent)}
+.intro .lede{margin:.9em 0 0;font-size:20px;line-height:1.45;color:var(--ink);max-width:21em}
 
-/* the links menu: opens on hover or focus, and on a click for touch */
-.dd{grid-column:9 / -1;justify-self:end;position:relative;z-index:10}
-.dd-b{display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--bg);font-size:18px;line-height:1;padding:12px 22px}
-.dd-b svg{width:12px;height:12px;transition:transform .15s}
-.dd-m{position:absolute;right:0;top:calc(100% + 6px);min-width:100%;background:var(--surface);border:1px solid var(--rule);padding:6px 0;
-  opacity:0;visibility:hidden;transition:opacity .12s,visibility .12s}
-.dd-m::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}
-.dd:hover .dd-m,.dd:focus-within .dd-m,.dd.open .dd-m{opacity:1;visibility:visible}
-.dd:hover svg,.dd:focus-within svg,.dd.open svg{transform:rotate(180deg)}
-.dd.shut .dd-m{opacity:0!important;visibility:hidden!important}
-.dd.shut svg{transform:none!important}
-.dd-m a{display:flex;justify-content:space-between;align-items:center;gap:28px;padding:9px 18px;font-size:18px;line-height:1.2;white-space:nowrap}
-.dd-m a span{font-family:var(--mono);font-size:13px;color:var(--ink-3)}
-.dd-m a:hover,.dd-m a:hover span{color:var(--accent)}
-
-.intro{padding:clamp(48px,7vw,96px) 0 0;border-bottom:0}
-/* the sentence takes its width from the name, so the two make one block */
-.intro .who{grid-column:1 / span 4;width:fit-content;max-width:100%}
-.intro h1{font-size:clamp(44px,5.2vw,76px);line-height:.9;letter-spacing:-.045em;margin:0 0 .3em -.03em;white-space:nowrap}
-.intro .lede{width:0;min-width:100%;font-size:20px;line-height:1.4}
-.work{grid-column:5 / -1}
-
-/* tabs and search, shown by site.js; with scripts off the list is simply all there */
-.filter{display:flex;align-items:flex-end;gap:16px}
-.tabs{position:relative;display:flex;gap:4px}
-.tab,.search{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase}
-.tab,.search{line-height:16px}
-.tab{color:var(--ink-3);padding:8px 10px 11px;transition:color .18s}
-.tab:hover,.tab[aria-pressed="true"]{color:var(--ink)}
-.tabs .sel{position:absolute;left:0;bottom:-1px;z-index:1;height:3px;width:0;background:var(--accent);transition:transform .2s ease-out,width .2s ease-out}
-.search{flex:0 1 9em;min-width:5em;margin-left:auto;text-align:right;color:var(--ink);background:none;border:0;border-radius:0;padding:8px 0 11px}
-.search::placeholder{color:var(--ink);opacity:1}
-.search:focus::placeholder{color:var(--ink-3)}
-.search::-webkit-search-cancel-button{display:none}
-
-.rows{border-top:1px solid var(--ink)}
-.row{display:grid;grid-template-columns:150px minmax(0,1fr);column-gap:var(--col-gap);align-items:baseline;padding:20px 0;border-bottom:1px solid var(--rule)}
-.row .when{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
-.row .t{display:block;font-size:27px;line-height:1.15;font-weight:500;letter-spacing:-.01em}
-.row .d{display:block;color:var(--ink-2);font-size:18px;line-height:1.4;margin-top:4px}
+.rows{margin-top:clamp(40px,6vw,72px);border-top:3px solid var(--ink)}
+.row{display:grid;grid-template-columns:56px minmax(0,2fr) minmax(0,5fr);column-gap:var(--col-gap);align-items:baseline;
+  padding:22px 0;border-bottom:1px solid var(--ink)}
+.row .no{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
+.row .t{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-.015em}
+.row .d{color:var(--ink-2);font-size:19px;line-height:1.4}
 a.row:hover .t{color:var(--accent)}
-.row.blank .when,.row.blank .t,.row.blank .d{color:var(--ink-3)}
-.none{margin:0;padding:20px 0;color:var(--ink-2);font-size:18px}
+.row.blank .no,.row.blank .t,.row.blank .d{color:var(--ink-3)}
 
 /* article */
 .body{padding-top:36px}
@@ -166,15 +141,17 @@ a.row:hover .t{color:var(--accent)}
   .grid>*,.head .lede,.head .facts,.row .what,.row .arr,.prose{grid-column:1}
   .head{padding:52px 0 26px}
   .head .facts{margin-top:24px}
-  .bar{grid-template-columns:repeat(6,minmax(0,1fr))}
-  .bar .logo{grid-column:1}
-  .bar .dd{grid-column:3 / -1}
-  .intro .who{grid-column:1;width:auto}
-  .intro h1{white-space:normal}
-  .intro .lede{width:auto;min-width:0}
-  .work{margin-top:40px}
-  .row{grid-template-columns:minmax(0,1fr);row-gap:4px;padding:16px 0 18px}
-  .row .t{font-size:24px}
+  .home .wrap{padding:0 var(--edge)}
+  .intro h1{margin-left:0}
+  /* name, paragraph, then the links */
+  .intro{display:flex;flex-direction:column;padding:calc(var(--edge) + 8px - var(--name) * .15) 0 0}
+  .intro .top{display:contents}
+  .intro .lede{order:1}
+  .intro .links{order:2;margin-top:16px}
+  .row{grid-template-columns:40px minmax(0,1fr);row-gap:4px;padding:16px 0 18px}
+  .row .t,.row .d{grid-column:2}
+  .row .t{font-size:22px}
+  .row .d{font-size:18px}
   .body{padding-top:28px}
   .spy{top:var(--nav-h);left:0;right:0;background:color-mix(in srgb,var(--bg) 92%,transparent);
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
