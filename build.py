@@ -79,7 +79,7 @@ ABSOLUTE = re.compile(r"([a-z][a-z0-9+.-]*:|#|/)", re.I)
 
 def repo_url(p, url, raw):
     """A link relative to the article file, as a URL into the repo at the pinned commit."""
-    path = posixpath.normpath(posixpath.join(p["base"], url))
+    path = posixpath.normpath(posixpath.join(p["prefix"] + p["base"], url))
     host = f"https://raw.githubusercontent.com/{p['repo']}/{p['sha']}/" if raw else f"https://github.com/{p['repo']}/blob/{p['sha']}/"
     return host + path
 
@@ -148,10 +148,18 @@ def demote(notes_text):
     return "\n".join(out)
 
 
-def read_project(site, folder, slug, url, is_self=False):
+def read_project(site, folder, slug, url, is_self=False, is_local=False):
     repo = url.split("github.com/")[-1]
-    full_sha = git("rev-parse", "HEAD", cwd=folder)
-    date = datetime.strptime(git("log", "-1", "--format=%cs", cwd=folder), "%Y-%m-%d")
+    if is_local:
+        # A local article has no repo of its own: its commit and date are those of its folder in this repo.
+        # Before its first commit it has neither, so the build falls back to HEAD and today.
+        stamp = git("log", "-1", "--format=%H %cs", "--", str(folder.relative_to(ROOT)))
+        full_sha, day = stamp.split() if stamp else (git("rev-parse", "HEAD"), f"{datetime.now():%Y-%m-%d}")
+        date = datetime.strptime(day, "%Y-%m-%d")
+    else:
+        full_sha = git("rev-parse", "HEAD", cwd=folder)
+        date = datetime.strptime(git("log", "-1", "--format=%cs", cwd=folder), "%Y-%m-%d")
+    prefix = f"{folder.relative_to(ROOT).as_posix()}/" if is_local else ""
     # The article is article/article.md; a project without one falls back to its README.
     # This repo's own entry has no fallback: its README is the documentation, not an article.
     candidates = ("article/article.md",) if is_self else ("article/article.md", "README.md")
@@ -162,20 +170,21 @@ def read_project(site, folder, slug, url, is_self=False):
     notes = (notes_dir / "notes.md").read_text() if (notes_dir / "notes.md").exists() else ""
     log = (notes_dir / "log.md").read_text() if (notes_dir / "log.md").exists() else ""
     return {
-        "slug": slug, "repo": repo, "url": url, "sha": full_sha[:7], "date": date, "self": is_self,
-        "folder": folder, "file": source, "base": posixpath.dirname(source),
+        "slug": slug, "repo": repo, "url": url, "sha": full_sha[:7], "date": date, "self": is_self, "local": is_local,
+        "folder": folder, "file": source, "base": posixpath.dirname(source), "prefix": prefix,
         "readme": text, "title": title or slug, "has_title": bool(title), "lede": lede, "abstract": abstract, "body": body,
         "notes": notes, "log": log,
         # A live demo is article/demo/index.html: a page of its own, shown in a frame at the top of the article.
         "demo": source == "article/article.md" and (folder / "article" / "demo" / "index.html").is_file(),
-        "source_url": f"{url}/tree/{full_sha}",
+        "source_url": f"{url}/blob/{full_sha}/{prefix}{source}" if is_local else f"{url}/tree/{full_sha}",
         "page_url": f"{site['url']}/{slug}/",
         "md_abs": f"{site['url']}/{slug}.md",
     }
 
 
 def load_projects(site):
-    """Live projects: the submodules under projects/, plus this repo if it has an article.
+    """Live projects: the submodules under projects/, plus this repo if it has an article,
+    plus each local article: local/<slug>/article/article.md, for a project whose repo is private.
 
     Submodules under archive/ are kept with their pins, notes and logs but not built.
     """
@@ -190,6 +199,9 @@ def load_projects(site):
         projects.append(read_project(site, ROOT / path, Path(path).name, url))
     if (ROOT / "article" / "article.md").exists():
         projects.append(read_project(site, ROOT, site.get("self_slug", "portfolio"), site["repo"], is_self=True))
+    for folder in sorted((ROOT / "local").glob("*/")) if (ROOT / "local").is_dir() else []:
+        if (folder / "article" / "article.md").exists():
+            projects.append(read_project(site, folder, folder.name, site["repo"], is_local=True))
     # Pinned projects first, in the order site.toml gives; the rest most recently updated first.
     pinned = site.get("pinned", [])
     for p in projects:
@@ -267,7 +279,7 @@ def build():
         page = fill(
             article,
             title=esc(p["title"]), standfirst=inline(p["lede"]), abstract=abstract_html(p["abstract"]),
-            repo=esc(p["repo"]), repo_url=esc(p["url"]),
+            repo_row=("<dd>Private</dd>" if p["local"] else f'<dd><a href="{esc(p["url"])}">{esc(p["repo"])}</a></dd>'),
             updated=f"{p['date']:%b %d, %Y}", sha=p["sha"],
             source_url=esc(p["source_url"]), slug=p["slug"],
             page_url=esc(p["page_url"]), md_abs=esc(p["md_abs"]),
@@ -326,16 +338,16 @@ def check(projects):
         if not p["readme"]:
             errors.append(f"{s}: no article/article.md and no README.md")
             continue
-        if p["file"] != "article/article.md" and not p["self"]:
+        if p["file"] != "article/article.md" and not p["self"] and not p["local"]:
             warnings.append(f"{s}: no article/article.md, so the page is built from README.md")
         if not p["has_title"]:
             errors.append(f"{s}: {p['file']} has no title (a first line starting with '# ')")
         if not (OUT / f"{s}.md").exists():
             errors.append(f"{s}: no markdown twin was built")
-        if not p["self"] and not p["notes"]:
+        if not p["self"] and not p["local"] and not p["notes"]:
             errors.append(f"{s}: notes/{s}/notes.md is missing")
         newest = next((l for l in p["log"].splitlines() if l.strip() and not l.startswith("#")), "")
-        if not p["self"] and p["sha"] not in newest:
+        if not p["self"] and not p["local"] and p["sha"] not in newest:
             errors.append(f"{s}: pinned at {p['sha']} but the newest line of notes/{s}/log.md does not name it; run /sync")
         # ARTICLES.md rules: warn, never block.
         if not p["lede"]:
