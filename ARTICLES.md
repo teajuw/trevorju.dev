@@ -42,6 +42,24 @@ from `/sync` and `/publish`.
 A project with no `article/article.md` still gets a page: the site falls back
 to `README.md` and `/check` says so.
 
+### A project whose repo is private
+
+The site builds from public repos only. A project that has to stay private can
+still have an article, kept in this repo:
+
+```
+trevorju.dev/
+└── local/<name>/article/
+    ├── article.md         written by hand, to this same standard
+    └── *.png *.svg        its visuals
+```
+
+The build never opens the private repo. The page shows "Private" where the repo
+link would be, "View source" points at the article file here, and the date and
+commit are those of the article's last change. It has no notes and no log, and
+`/sync` does not touch it. Nothing goes in the article that could not be public:
+it is the only part of the project anyone else can read.
+
 ## The format
 
 GitHub-flavoured Markdown. No front matter, no HTML, no custom syntax. The
@@ -190,6 +208,9 @@ needs one is a judgement, not a rule.
 
 - 2026-11-14: the Sources section became standard, after the site's own article
   cited the research it rests on. bar2vec was the first project to adopt it.
+
+- 2026-11-17: an article may live in `local/<name>/` when its project's repo is
+  private. job-app was the first: its repo holds a transcript and a resume.
 
 ## Not decided yet
 
